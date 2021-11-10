@@ -1,0 +1,3 @@
+[submodule "Bloomscope"]
+	path = Bloomscope
+	url = https://github.com/Blazeleo/Bloomscope.git
