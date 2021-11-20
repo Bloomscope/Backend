@@ -1,7 +1,4 @@
-
-from datetime import datetime
-import datetime as dt
-from flask_login import UserMixin
+import datetime
 from . import db
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from .config import SECRET_KEY
@@ -9,8 +6,8 @@ from .dtypes import *
 import uuid
 
 
-class UserType(db.Model):
-    ___tablename__ = 'users_type'
+class UsersType(db.Model):
+    # ___tablename__ = 'users_type'
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     type = db.Column(db.String(8), nullable=False) # student or user, teacher, admin
     access_level = db.Column(db.INTEGER, default=1) # 1 = user, 2 = teacher, 3 = admin
@@ -18,7 +15,7 @@ class UserType(db.Model):
 
 
 class Plans(db.Model):
-    __tablename__ = 'plans'
+    # __tablename__ = 'plans'
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     plan = db.Column(db.String(15), nullable=False, unique=True) # plan type. ex: gold for 3 months, etc
     validity = db.Column(db.INTEGER, nullable=False) # plan validity in days
@@ -26,27 +23,27 @@ class Plans(db.Model):
 
 
 class Organization(db.Model):
-    __tablename__ = 'organization'
+    # __tablename__ = 'organization'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
-    added_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    added_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     name = db.Column(db.String(50), nullable=False)
     org_id = db.Column(db.String(8), unique=True, default=org_id().__str__())
     address = db.Column(db.String(50), nullable=False)
     registered_by = db.relationship('User', backref='organization', lazy=True)
 
 
-class User(db.Model, UserMixin):
-    __tablename__ = 'user'
+class User(db.Model):
+    # __tablename__ = 'user'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
-    registered_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    registered_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     fname = db.Column(db.String(20), nullable=False)
     mname = db.Column(db.String(20))
     lname = db.Column(db.String(20), nullable=False)
-    dob = db.Column(db.Date, nullabe=False)
+    dob = db.Column(db.Date, nullable=False)
     email = db.Column(db.String(32), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     phone = db.Column(db.String(15), nullable=False)
-    last_logged_in = db.Column(db.Datetime, nullable=False, default=datetime.utcnow)
+    last_logged_in = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     is_verified = db.Column(db.Boolean, default=False)
     has_added_gaurdians = db.Column(db.Boolean, default=False)
     user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False)
@@ -60,37 +57,37 @@ class User(db.Model, UserMixin):
 
 
 class Subscription(db.Model):
-    __tablename__ = 'subscription'
+    # __tablename__ = 'subscription'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
-    subscribed_on = db.Column(db.Datetime, nullable=False, default=datetime.utcnow)
-    expires_on = db.Column(db.Datetime, nullable=False)
+    subscribed_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
+    expires_on = db.Column(db.DateTime, nullable=False)
     plan_id = db.Column(db.INTEGER, db.ForeignKey('plans.id', ondelete='CASCADE'), nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 
 
 class Parent(db.Model):
-    __tablename__ = 'parent'
+    # __tablename__ = 'parent'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
-    registered_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    registered_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     fname = db.Column(db.String(20), nullable=False)
     mname = db.Column(db.String(20))
     lname = db.Column(db.String(20), nullable=False)
-    dob = db.Column(db.Date, nullabe=False)
+    dob = db.Column(db.Date, nullable=False)
     email = db.Column(db.String(32), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     phone = db.Column(db.String(15), nullable=False)
-    last_logged_in = db.Column(db.Datetime, nullable=False, default=datetime.utcnow)
+    last_logged_in = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     parent_child_rel = db.relationship('Parent_Child', backref='parent', lazy=True)
 
 
 class Parent_Child(db.Model):
-    __tablename__ = 'parent_child'
+    # __tablename__ = 'parent_child'
     parent_id = db.Column(GUID(), db.ForeignKey('parent.id', ondelete='CASCADE'), primary_key=True, nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True, nullable=False)
 
 
 class Parameters(db.Model):
-    __tablename__ = 'parameters'
+    # __tablename__ = 'parameters'
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     param_name = db.Column(db.String(32), unique=True, nullable=False)
     mapped = db.relationship('Questions', backref='parameters', lazy=True)
@@ -98,7 +95,7 @@ class Parameters(db.Model):
 
 
 class Test(db.Model):
-    __tablename__ = 'test'
+    # __tablename__ = 'test'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = db.Column(db.String(32), nullable=False, unique=True)
     conducted_on = db.Column(db.DateTime, nullable=False)
@@ -112,7 +109,7 @@ class Test(db.Model):
 
 
 class Questions(db.Model):
-    __tablename__ = 'questions'
+    # __tablename__ = 'questions'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     question = db.Column(db.Text, nullable=False)
     options = db.Column(db.PickleType, nullable=False)
@@ -125,24 +122,24 @@ class Questions(db.Model):
 
 
 class Results(db.Model):
-    __tablename__ = 'results'
+    # __tablename__ = 'results'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
-    completed_on = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
     responses = db.Column(db.PickleType, nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 
 
 class Announcements(db.Model):
-    __tablename__ = 'announcements'
+    # __tablename__ = 'announcements'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
-    announced_on = db.Column(db.DateTime, default=datetime.utcnow)
+    announced_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     content = db.Column(db.Text, nullable=False)
     announced_by = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
 
 
 class Suggestions(db.Model):
-    __tablename__ = 'suggestions'
+    # __tablename__ = 'suggestions'
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     suggestion_name = db.Column(db.String(32), nullable=False, unique=True)
     param_id = db.Column(db.INTEGER, db.ForeignKey('parameters.id'), nullable=False)
@@ -150,9 +147,9 @@ class Suggestions(db.Model):
 
 
 class Complain(db.Model):
-    __talename__ = 'complain'
+    # __talename__ = 'complain'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
-    raised_on = db.Column(db.DateTime, default=datetime.utcnow)
+    raised_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     ticket_id = db.Column(db.String(8), default=org_id())
     status = db.Column(db.String(32), default='Pending') # pending, completed, in review
     reason = db.Column(db.Text, nullable=False)
