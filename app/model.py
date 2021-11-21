@@ -55,6 +55,9 @@ class User(db.Model):
     announcements = db.relationship('Announcements', backref='user', lazy=True)
     complains = db.relationship('Complain', backref='user', lazy=True)
 
+    def as_dict(self):
+        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
+
 
 class Subscription(db.Model):
     # __tablename__ = 'subscription'
