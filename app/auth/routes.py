@@ -1,6 +1,6 @@
 import bcrypt
 from flask import Blueprint, request, jsonify
-from .. import db, bcrypt, jwt
+from .. import db, bcrypt
 import datetime
 from ..model import *
 from flask_jwt_extended import create_access_token
@@ -9,7 +9,7 @@ from flask_jwt_extended import create_access_token
 auth = Blueprint('auth', __name__)
 
 
-@auth.route('/api/register', methods=['POST'])
+@auth.route('/api/register_user', methods=['POST'])
 def register():
     data = request.get_json(force=True)
     dob = data.pop('dob')
@@ -19,7 +19,8 @@ def register():
     new_user = User(**data, dob=datetime.datetime.strptime(dob, '%Y-%m-%d'), password=bcrypt.generate_password_hash(password).decode('utf-8'))
     db.session.add(new_user)
     db.session.commit()
-    return jsonify({'status': 'success', 'errors': None}), 200
+    db.session.flush()
+    return jsonify({'status': 'success', 'errors': None, 'user_id': new_user.id}), 200
 
 
 @auth.route('/api/login', methods=['POST'])
@@ -42,9 +43,27 @@ def admin_login():
             access_token = create_access_token(identity=user.email)
             status['is_logged_in'] = True
             status['access_token'] = access_token
-            return jsonify(status)
+            return jsonify(status), 200
         else:
             status['errors'] = 'user doesnt have permission to acces this routes'
-            return jsonify(status)
+            return jsonify(status), 403
     status['errors'] = 'email or password doesnt match'
-    return jsonify(status)
+    return jsonify(status), 401
+
+
+@auth.route('/api/register_parent', methods=['POST'])
+def register_parent():
+    data = request.get_json(force=True)
+    uid = data.pop('uid')
+    dob = data.pop('dob')
+    password = data.pop('password')
+    user = User.query.filter_by(id=uid).first()
+    if user:
+        new_parent = Parent(**data, dob=datetime.datetime.strptime(dob, '%Y-%m-%d'), password=bcrypt.generate_password_hash(password).decode('utf-8'))
+        db.session.add(new_parent)
+        db.session.flush()
+        new_relation = Parent_Child(parent_id=new_parent.id, user_id=uid)
+        db.session.add(new_relation)
+        db.session.commit()
+        return jsonify({'status': 'success', 'errors': None})
+    return jsonify({'status': 'failed', 'errors': 'user not found'})

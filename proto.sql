@@ -72,6 +72,8 @@ create table if not exists `parent` (
     `phone` varchar(15) not null,
 	`relation` varchar(20) not null,
     `last_logged_in` datetime default current_timestamp,
+    `user_type_id` int not null default 2,
+    foreign key(`user_type_id`) references `users_type`(`id`),
     primary key(`id`)
 );
 
@@ -129,6 +131,7 @@ create table if not exists `results` (
 create table if not exists `announcements` (
 	`id` varchar(32) not null,
     `announced_on` datetime default current_timestamp,
+    `title` varchar(100) not null,
     `content` longtext not null,
     `announced_by` varchar(32) not null,
     primary key(`id`),

@@ -4,6 +4,7 @@ from flask_jwt_extended import verify_jwt_in_request
 from flask_jwt_extended import get_jwt_identity
 from ..model import User
 
+
 def admin_required():
     def wrapper(fn):
         @wraps(fn)

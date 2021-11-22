@@ -46,7 +46,7 @@ class User(db.Model):
     last_logged_in = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     is_verified = db.Column(db.Boolean, default=False)
     has_added_gaurdians = db.Column(db.Boolean, default=False)
-    user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False)
+    user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False) #make default to 1
     organization_id = db.Column(GUID(), db.ForeignKey('organization.id', ondelete='CASCADE'), default=None)
     subscription = db.relationship('Subscription', backref='user', lazy=True)
     parent_child_rel = db.relationship('Parent_Child', backref='user', lazy=True)
@@ -80,6 +80,7 @@ class Parent(db.Model):
     password = db.Column(db.String(80), nullable=False)
     phone = db.Column(db.String(15), nullable=False)
     last_logged_in = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
+    # user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False, default=2)
     parent_child_rel = db.relationship('Parent_Child', backref='parent', lazy=True)
 
 
@@ -107,8 +108,9 @@ class Test(db.Model):
     ends_on = db.Column(db.DateTime, nullable=False)
     tracks = db.relationship('Questions', backref='test', lazy=True)
     res_tracks = db.relationship('Results', backref='test', lazy=True)
+
     def populate(self, days=10):
-        self.ends_on = self.conducted_on+dt.timedelta(days)
+        self.ends_on = self.conducted_on+datetime.timedelta(days)
 
 
 class Questions(db.Model):
@@ -137,6 +139,7 @@ class Announcements(db.Model):
     # __tablename__ = 'announcements'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     announced_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
+    title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
     announced_by = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
 
