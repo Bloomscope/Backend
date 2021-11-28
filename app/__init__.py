@@ -18,10 +18,14 @@ def create_app():
     from .auth import routes as auth_routes
     from .admin_dashboard import routes as admin_dash_routes
     from .errors import routes as error_handlers
+    from .students import routes as student_routes
+    from .parents import routes as parent_routes
 
     app.register_blueprint(auth_routes.auth)
     app.register_blueprint(admin_dash_routes.admin_dash)
     app.register_blueprint(error_handlers.errors)
+    app.register_blueprint(student_routes.student)
+    app.register_blueprint(parent_routes.parent)
 
     db.init_app(app)
     jwt.init_app(app)

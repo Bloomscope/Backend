@@ -54,6 +54,7 @@ class User(db.Model):
     results = db.relationship('Results', backref='user', lazy=True)
     announcements = db.relationship('Announcements', backref='user', lazy=True)
     complains = db.relationship('Complain', backref='user', lazy=True)
+    # Suggestions = db.relationship('Suggestions', backref='user', lazy=True)
 
     def as_dict(self):
         return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
@@ -83,6 +84,9 @@ class Parent(db.Model):
     # user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False, default=2)
     parent_child_rel = db.relationship('Parent_Child', backref='parent', lazy=True)
 
+    def as_dict(self):
+        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
+
 
 class Parent_Child(db.Model):
     # __tablename__ = 'parent_child'
@@ -103,7 +107,7 @@ class Test(db.Model):
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = db.Column(db.String(32), nullable=False, unique=True)
     conducted_on = db.Column(db.DateTime, nullable=False)
-    questions = db.Column(db.PickleType, nullable=False)
+    questions = db.Column(db.PickleType, nullable=True)
     durations = db.Column(db.INTEGER, nullable=False)
     ends_on = db.Column(db.DateTime, nullable=False)
     tracks = db.relationship('Questions', backref='test', lazy=True)
@@ -143,13 +147,21 @@ class Announcements(db.Model):
     content = db.Column(db.Text, nullable=False)
     announced_by = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
 
+    def as_dict(self):
+        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
+
 
 class Suggestions(db.Model):
     # __tablename__ = 'suggestions'
+    # add student_id if they are specific to student
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     suggestion_name = db.Column(db.String(32), nullable=False, unique=True)
     param_id = db.Column(db.INTEGER, db.ForeignKey('parameters.id'), nullable=False)
     suggestion = db.Column(db.Text, nullable=False)
+    # student_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
+
+    def as_dict(self):
+        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
 
 
 class Complain(db.Model):

@@ -143,8 +143,9 @@ create table if not exists `suggestions` (
     `suggestion_name` varchar(32) not null unique,
     `param_id` int not null,
     `suggestion` longtext,
+    `student_id` varchar(32) not null,
     primary key(`id`),
-    foreign key(`param_id`) references `parameters`(`id`)
+    foreign key(`student_id`) references `user`(`id`),
 );
 
 create table if not exists `complain` (

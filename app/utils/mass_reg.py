@@ -34,7 +34,3 @@ class MassRegister:
         else:
             self.response['errors'] = {'UnKnown File Type': 'Currently accepts json or csv files only.'}
         return self.response
-
-
-s = MassRegister('csv', open('test.json', 'r').read())
-print(s())

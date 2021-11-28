@@ -29,12 +29,45 @@ def get_users():
     return jsonify(data)
 
 
-@admin_dash.route('/api/create_announcement')
+@admin_dash.route('/api/get_parent_info')
+@admin_required()
+def get_parent_info():
+    uid = request.args.get('uid')
+    pid = Parent_Child.query.filter_by(user_id=uid).first().parent_id
+    parent = Parent.query.filter_by(id=pid).first()
+    return jsonify(parent.as_dict())
+
+
+@admin_dash.route('/api/create_announcement', methods=['POST'])
 @admin_required()
 def create_announcement():
     data = request.get_json(force=True)
-    new_announcement = Announcements(**data)
+    current_user = current_user_proxy_obj()
+    new_announcement = Announcements(**data, announced_by=current_user)
     db.session.add(new_announcement)
     db.session.flush()
     db.session.commit()
     return jsonify({'status': 'success', 'announcement_id': new_announcement.id})
+
+
+# @admin_dash.route('/api/get_announcements')
+# @admin_required()
+# def get_all_announcements():
+#     count = request.args.get('count')
+#     if count is None:
+#         announcements = Announcements.query.order_by(Announcements.announced_on.desc()).all()
+#     else:
+#         announcements = Announcements.query.order_by(Announcements.announced_on.desc()).limit(int(count)).all()
+#     return jsonify({'count': count,  'announcements': [i.as_dict() for i in announcements]})
+
+
+@admin_dash.route('/api/add_suggestions', methods=['POST'])
+@admin_required()
+def add_suggestions():
+    suggestions = request.get_json(force=True)
+    new_suggestion = Suggestions(**suggestions)
+    db.session.add(new_suggestion)
+    db.session.flush()
+    db.session.commit()
+    return jsonify({'status': 'success', 'suggestion_id': new_suggestion.id})
+    
