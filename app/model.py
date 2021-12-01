@@ -43,7 +43,7 @@ class User(db.Model):
     email = db.Column(db.String(32), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     phone = db.Column(db.String(15), nullable=False)
-    last_logged_in = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
+    last_logged_in = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     is_verified = db.Column(db.Boolean, default=False)
     has_added_gaurdians = db.Column(db.Boolean, default=False)
     user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False) #make default to 1
