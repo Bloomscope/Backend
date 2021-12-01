@@ -98,6 +98,7 @@ create table if not exists `test` (
     `questions` longblob not null,
     `duration` int not null, 
     `ends_on` datetime,
+    `is_active` boolean default 0,
     primary key(`id`)
 );
 
@@ -146,6 +147,7 @@ create table if not exists `suggestions` (
     `student_id` varchar(32) not null,
     primary key(`id`),
     foreign key(`student_id`) references `user`(`id`),
+    foreign key(`param_id`) references `parameters`(`id`)
 );
 
 create table if not exists `complain` (
@@ -158,3 +160,24 @@ create table if not exists `complain` (
     primary key(`id`),
     foreign key(`raised_by`) references `user`(`id`)
 );
+
+create table if not exists `test_attempts` (
+    `user_id` varchar(32) not null,
+    `test_id` varchar(32) not null,
+    `attempted_on` datetime default current_timestamp,
+    primary key(`user_id`, `test_id`),
+    foreign key(`user_id`) references `user`(`id`),
+    foreign key(`test_id`) references `test`(`id`)
+);
+
+create table if not exists `token` (
+	`id` varchar(32) not null,
+    `created_on` datetime default current_timestamp,
+    `reason` text not null,
+    `test_id` varchar(32) not null,
+    `status` varchar(20) default 'pending',
+    `user_id` varchar(32) not null,
+    primary key(`id`),
+    foreign key(`test_id`) references `test`(`id`),
+    foreign key(`user_id`) references `user`(`id`)
+)

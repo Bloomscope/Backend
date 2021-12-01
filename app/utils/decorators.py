@@ -24,6 +24,6 @@ def current_user_proxy_obj():
     try:
         verify_jwt_in_request()
         user = User.query.filter_by(email=get_jwt_identity()).first()
-        return user.id
+        return user
     except:
         return False

@@ -50,15 +50,15 @@ def create_announcement():
     return jsonify({'status': 'success', 'announcement_id': new_announcement.id})
 
 
-# @admin_dash.route('/api/get_announcements')
-# @admin_required()
-# def get_all_announcements():
-#     count = request.args.get('count')
-#     if count is None:
-#         announcements = Announcements.query.order_by(Announcements.announced_on.desc()).all()
-#     else:
-#         announcements = Announcements.query.order_by(Announcements.announced_on.desc()).limit(int(count)).all()
-#     return jsonify({'count': count,  'announcements': [i.as_dict() for i in announcements]})
+@admin_dash.route('/api/get_announcements')
+@admin_required()
+def get_all_announcements():
+    count = request.args.get('count')
+    if count is None:
+        announcements = Announcements.query.order_by(Announcements.announced_on.desc()).all()
+    else:
+        announcements = Announcements.query.order_by(Announcements.announced_on.desc()).limit(int(count)).all()
+    return jsonify({'count': count,  'announcements': [i.as_dict() for i in announcements]})
 
 
 @admin_dash.route('/api/add_suggestions', methods=['POST'])
@@ -70,4 +70,17 @@ def add_suggestions():
     db.session.flush()
     db.session.commit()
     return jsonify({'status': 'success', 'suggestion_id': new_suggestion.id})
-    
+
+
+@admin_dash.route('/api/get_tokens')
+@admin_required()
+def get_tokens():
+    uid = request.args.get('uid')
+    resp = {}
+    if uid is not None:
+        data = Token.query.filter_by(user_id=uid).all()
+        resp['data'] = [i.as_dict() for i in data]
+    else:
+        data = Token.query.all()
+        resp['data'] = [i.as_dict() for i in data]
+    return jsonify(resp)

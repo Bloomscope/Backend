@@ -105,6 +105,7 @@ class Parameters(db.Model):
 
 
 class Test(db.Model):
+    # add scheduler to make test active and end, trigger to create a test with all questions 
     __tablename__ = 'test'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = db.Column(db.String(32), nullable=False, unique=True)
@@ -112,6 +113,7 @@ class Test(db.Model):
     questions = db.Column(db.PickleType, nullable=True)
     durations = db.Column(db.INTEGER, nullable=False)
     ends_on = db.Column(db.DateTime, nullable=False)
+    is_active = db.Column(db.Boolena, default=False)
     tracks = db.relationship('Questions', backref='test', lazy=True)
     res_tracks = db.relationship('Results', backref='test', lazy=True)
     attempts_tracker = db.relationship('TestAttempts', backref='test', lazy=True)
@@ -133,6 +135,9 @@ class Questions(db.Model):
     added_by_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
     asked_on = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
 
+    def as_dict(self):
+        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
+        
 
 class Results(db.Model):
     __tablename__ = 'results'
@@ -192,3 +197,6 @@ class Token(db.Model):
     status = db.Column(db.String(20), default='Pending')
     test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
+
+    def as_dict(self):
+        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}

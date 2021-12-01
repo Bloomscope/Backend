@@ -21,6 +21,34 @@ def get_announcements():
 @student.route('/api/get_suggestions')
 @jwt_required()
 def get_suggestions():
-    # might have to add student id
-    suggestions = Suggestions.query.all()
-    return jsonify({'suggestions': [i.as_dict() for i in suggestions]})
+    uid = request.args.get('id')
+    if uid is None or uid == '':
+        return jsonify({'user_id': uid, 'errors': 'invalid user id or invalid session'})
+    suggestions = Suggestions.query.filter_by(user_id=uid).all()
+    return jsonify({'user_id': uid, 'suggestions': [i.as_dict() for i in suggestions]})
+
+
+@student.route('/api/create_token', methods=['POST'])
+@jwt_required()
+def new_token():
+    data = request.get_json(force=True)
+    new_token = Token(**data, user_id=current_user.id)
+    db.session.add(new_token)
+    db.session.flush()
+    db.session.commit()
+    return jsonify({'errors': None, 'status': 'success', 'id': new_token.id})
+
+
+@student.route('/api/get_report')
+@jwt_required()
+def get_report():
+    tests = Test.query.all()
+    tests_lists = [(i.id, i.name) for i in tests]
+    res = {'data': []}
+    for i in tests_lists:
+        has_attempted = TestAttempts.query.filter_by(user_id=current_user.id).filter_by(test_id=i[0]).first() is not None
+        if has_attempted:
+            res['data'].append({'test_id': i[0], 'test_name': i[1], 'user_id': current_user.id, 'has_attempted': True})
+        else:
+            res['data'].append({'test_id': i[0], 'test_name': i[1], 'user_id': current_user.id, 'has_attempted': False})
+    return jsonify(res)
