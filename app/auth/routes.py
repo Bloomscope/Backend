@@ -29,7 +29,7 @@ def login():
     user = User.query.filter_by(email=data['email']).first()
     if user and bcrypt.check_password_hash(user.password, data['password']):
         access_token = create_access_token(identity=user.email)
-        return jsonify({'is_logged_in': True, 'access_token': access_token, 'errors': None})
+        return jsonify({'is_logged_in': True, 'access_token': access_token, 'type': user.user_type_id , 'errors': None})
     return jsonify({'is_logged_in': False, 'access_token': None, 'errors': 'email or password doesnt match'})
 
 
