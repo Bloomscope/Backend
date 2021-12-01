@@ -113,7 +113,7 @@ class Test(db.Model):
     questions = db.Column(db.PickleType, nullable=True)
     durations = db.Column(db.INTEGER, nullable=False)
     ends_on = db.Column(db.DateTime, nullable=False)
-    is_active = db.Column(db.Boolena, default=False)
+    is_active = db.Column(db.Boolean, default=False)
     tracks = db.relationship('Questions', backref='test', lazy=True)
     res_tracks = db.relationship('Results', backref='test', lazy=True)
     attempts_tracker = db.relationship('TestAttempts', backref='test', lazy=True)
