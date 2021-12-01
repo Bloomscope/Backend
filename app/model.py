@@ -7,7 +7,7 @@ import uuid
 
 
 class UsersType(db.Model):
-    # ___tablename__ = 'users_type'
+    ___tablename__ = 'users_type'
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     type = db.Column(db.String(8), nullable=False) # student or user, teacher, admin
     access_level = db.Column(db.INTEGER, default=1) # 1 = user, 2 = teacher, 3 = admin
@@ -15,7 +15,7 @@ class UsersType(db.Model):
 
 
 class Plans(db.Model):
-    # __tablename__ = 'plans'
+    __tablename__ = 'plans'
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     plan = db.Column(db.String(15), nullable=False, unique=True) # plan type. ex: gold for 3 months, etc
     validity = db.Column(db.INTEGER, nullable=False) # plan validity in days
@@ -23,7 +23,7 @@ class Plans(db.Model):
 
 
 class Organization(db.Model):
-    # __tablename__ = 'organization'
+    __tablename__ = 'organization'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     added_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     name = db.Column(db.String(50), nullable=False)
@@ -33,7 +33,7 @@ class Organization(db.Model):
 
 
 class User(db.Model):
-    # __tablename__ = 'user'
+    __tablename__ = 'user'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     registered_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     fname = db.Column(db.String(20), nullable=False)
@@ -54,14 +54,16 @@ class User(db.Model):
     results = db.relationship('Results', backref='user', lazy=True)
     announcements = db.relationship('Announcements', backref='user', lazy=True)
     complains = db.relationship('Complain', backref='user', lazy=True)
-    # Suggestions = db.relationship('Suggestions', backref='user', lazy=True)
+    Suggestions = db.relationship('Suggestions', backref='user', lazy=True)
+    attempts_tracker = db.relationship('TestAttempts', backref='user', lazy=True)
+    tokens = db.relationship('Token', backref='user', lazy=True)
 
     def as_dict(self):
         return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
 
 
 class Subscription(db.Model):
-    # __tablename__ = 'subscription'
+    __tablename__ = 'subscription'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     subscribed_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     expires_on = db.Column(db.DateTime, nullable=False)
@@ -70,7 +72,7 @@ class Subscription(db.Model):
 
 
 class Parent(db.Model):
-    # __tablename__ = 'parent'
+    __tablename__ = 'parent'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     registered_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     fname = db.Column(db.String(20), nullable=False)
@@ -81,7 +83,7 @@ class Parent(db.Model):
     password = db.Column(db.String(80), nullable=False)
     phone = db.Column(db.String(15), nullable=False)
     last_logged_in = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
-    # user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False, default=2)
+    user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False, default=2)
     parent_child_rel = db.relationship('Parent_Child', backref='parent', lazy=True)
 
     def as_dict(self):
@@ -89,13 +91,13 @@ class Parent(db.Model):
 
 
 class Parent_Child(db.Model):
-    # __tablename__ = 'parent_child'
+    __tablename__ = 'parent_child'
     parent_id = db.Column(GUID(), db.ForeignKey('parent.id', ondelete='CASCADE'), primary_key=True, nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True, nullable=False)
 
 
 class Parameters(db.Model):
-    # __tablename__ = 'parameters'
+    __tablename__ = 'parameters'
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     param_name = db.Column(db.String(32), unique=True, nullable=False)
     mapped = db.relationship('Questions', backref='parameters', lazy=True)
@@ -103,7 +105,7 @@ class Parameters(db.Model):
 
 
 class Test(db.Model):
-    # __tablename__ = 'test'
+    __tablename__ = 'test'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = db.Column(db.String(32), nullable=False, unique=True)
     conducted_on = db.Column(db.DateTime, nullable=False)
@@ -112,13 +114,15 @@ class Test(db.Model):
     ends_on = db.Column(db.DateTime, nullable=False)
     tracks = db.relationship('Questions', backref='test', lazy=True)
     res_tracks = db.relationship('Results', backref='test', lazy=True)
+    attempts_tracker = db.relationship('TestAttempts', backref='test', lazy=True)
+    tokens = db.relationship('Token', backref='test', lazy=True)
 
     def populate(self, days=10):
         self.ends_on = self.conducted_on+datetime.timedelta(days)
 
 
 class Questions(db.Model):
-    # __tablename__ = 'questions'
+    __tablename__ = 'questions'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     question = db.Column(db.Text, nullable=False)
     options = db.Column(db.PickleType, nullable=False)
@@ -131,7 +135,7 @@ class Questions(db.Model):
 
 
 class Results(db.Model):
-    # __tablename__ = 'results'
+    __tablename__ = 'results'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     completed_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
@@ -140,7 +144,7 @@ class Results(db.Model):
 
 
 class Announcements(db.Model):
-    # __tablename__ = 'announcements'
+    __tablename__ = 'announcements'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     announced_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     title = db.Column(db.String(100), nullable=False)
@@ -152,23 +156,39 @@ class Announcements(db.Model):
 
 
 class Suggestions(db.Model):
-    # __tablename__ = 'suggestions'
-    # add student_id if they are specific to student
+    __tablename__ = 'suggestions'
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     suggestion_name = db.Column(db.String(32), nullable=False, unique=True)
     param_id = db.Column(db.INTEGER, db.ForeignKey('parameters.id'), nullable=False)
     suggestion = db.Column(db.Text, nullable=False)
-    # student_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
+    student_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
 
     def as_dict(self):
         return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
 
 
 class Complain(db.Model):
-    # __talename__ = 'complain'
+    __tablename__ = 'complain'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     raised_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     ticket_id = db.Column(db.String(8), default=org_id())
     status = db.Column(db.String(32), default='Pending') # pending, completed, in review
     reason = db.Column(db.Text, nullable=False)
     raised_by = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
+
+
+class TestAttempts(db.Model):
+    __tablename__ = 'test_attempts'
+    test_id = db.Column(GUID(), db.ForeignKey('test.id'), primary_key=True, nullable=False)
+    user_id = db.Column(GUID(), db.ForeignKey('user.id'), primary_key=True, nullable=False)
+    attempted_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
+
+
+class Token(db.Model):
+    __tablename__ = 'token'
+    id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
+    created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
+    reason = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default='Pending')
+    test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
+    user_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
