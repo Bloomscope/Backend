@@ -23,7 +23,7 @@ def register():
     return jsonify({'status': 'success', 'errors': None, 'user_id': new_user.id}), 200
 
 
-@auth.route('/api/loginStudent', methods=['POST'])
+@auth.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json(force=True)
     user = User.query.filter_by(email=data['email']).first()
@@ -32,14 +32,6 @@ def login():
         return jsonify({'is_logged_in': True, 'access_token': access_token, 'type': user.user_type_id , 'errors': None})
     return jsonify({'is_logged_in': False, 'access_token': None, 'errors': 'email or password doesnt match'})
 
-@auth.route('/api/loginParent', methods=['POST'])
-def login():
-    data = request.get_json(force=True)
-    user = Parent.query.filter_by(email=data['email']).first()
-    if user and bcrypt.check_password_hash(user.password, data['password']):
-        access_token = create_access_token(identity=user.email)
-        return jsonify({'is_logged_in': True, 'access_token': access_token, 'type': user.user_type_id , 'errors': None})
-    return jsonify({'is_logged_in': False, 'access_token': None, 'errors': 'email or password doesnt match'})
 
 
 @auth.route('/api/admin_login', methods=['POST'])
