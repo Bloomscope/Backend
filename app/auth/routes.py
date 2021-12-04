@@ -49,6 +49,7 @@ def admin_login():
             status['is_logged_in'] = True
             status['access_token'] = access_token
             status['type'] = 3
+            status['uid'] = user.id
             return jsonify(status), 200
         else:
             status['errors'] = 'user doesnt have permission to acces this routes'
