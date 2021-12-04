@@ -53,7 +53,8 @@ def create_announcement():
 @admin_dash.route('/api/get_announcements')
 @admin_required()
 def get_all_announcements():
-    count = request.args.get('count')
+#     count = request.args.get('count')
+    count = None
     if count is None:
         announcements = Announcements.query.order_by(Announcements.announced_on.desc()).all()
     else:
