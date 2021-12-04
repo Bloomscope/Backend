@@ -1,5 +1,6 @@
 import json
-# from ..model import Questions
+from ..utils.decorators import current_user_proxy_obj as current_user
+from ..model import Questions, db
 
 
 '''
@@ -62,5 +63,12 @@ def add_questions(f):
     '''
     f -> file buffer|data buffer
     returns None
+    '''
+
+    '''
+    to add to db,
+    new_question = Questions(question=question, options=options, ans=ans, explanation=explanation, param_id=param_id, user_id=current_user().id)
+    db.session.add(new_question)
+    db.session.commit()
     '''
     pass
