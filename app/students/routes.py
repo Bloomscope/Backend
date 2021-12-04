@@ -7,7 +7,7 @@ from ..utils.decorators import current_user_proxy_obj as current_user
 student = Blueprint('student', __name__)
 
 
-@student.route('/api/get_announcements')
+@student.route('/api/user_get_announcements')
 @jwt_required()
 def get_announcements():
     count = request.args.get('count')
