@@ -18,6 +18,13 @@ def get_announcements():
     return jsonify({'count': count,  'announcements': [i.as_dict() for i in announcements]})
 
 
+@student.route('/api/student_info')
+@jwt_required()
+def student_info():
+    user = User.query.filter_by(id=current_user().id).first()
+    return jsonify(user.as_dict())
+
+
 @student.route('/api/get_suggestions')
 @jwt_required()
 def get_suggestions():
@@ -32,7 +39,7 @@ def get_suggestions():
 @jwt_required()
 def new_token():
     data = request.get_json(force=True)
-    new_token = Token(**data, user_id=current_user.id)
+    new_token = Token(**data, user_id=current_user().id)
     db.session.add(new_token)
     db.session.flush()
     db.session.commit()
@@ -46,9 +53,9 @@ def get_report():
     tests_lists = [(i.id, i.name) for i in tests]
     res = {'data': []}
     for i in tests_lists:
-        has_attempted = TestAttempts.query.filter_by(user_id=current_user.id).filter_by(test_id=i[0]).first() is not None
+        has_attempted = TestAttempts.query.filter_by(user_id=current_user().id).filter_by(test_id=i[0]).first() is not None
         if has_attempted:
-            res['data'].append({'test_id': i[0], 'test_name': i[1], 'user_id': current_user.id, 'has_attempted': True})
+            res['data'].append({'test_id': i[0], 'test_name': i[1], 'user_id': current_user().id, 'has_attempted': True})
         else:
-            res['data'].append({'test_id': i[0], 'test_name': i[1], 'user_id': current_user.id, 'has_attempted': False})
+            res['data'].append({'test_id': i[0], 'test_name': i[1], 'user_id': current_user().id, 'has_attempted': False})
     return jsonify(res)

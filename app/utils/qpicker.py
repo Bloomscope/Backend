@@ -12,6 +12,6 @@ def get_questions():
         quest['questions'].append({
             'param_id': i.id,
             'param_name': i.param_name,
-            'data': question
+            'data': [j.as_dict() for j in question]
         })
     return quest

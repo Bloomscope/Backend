@@ -42,12 +42,12 @@ def get_parent_info():
 @admin_required()
 def create_announcement():
     data = request.get_json(force=True)
-    current_user = current_user_proxy_obj()
+    current_user = current_user_proxy_obj().id
     new_announcement = Announcements(**data, announced_by=current_user)
     db.session.add(new_announcement)
     db.session.flush()
     db.session.commit()
-    return jsonify({'status': 'success', 'announcement_id': new_announcement.id})
+    return jsonify({'status': 'success', 'announcement_id': new_announcement.id, 'id': current_user})
 
 
 @admin_dash.route('/api/get_announcements')
