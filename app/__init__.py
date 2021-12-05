@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 import flask_cors
 import flask_bcrypt
+# from . import defaults as defaults
 
 
 db = SQLAlchemy()
@@ -34,4 +35,6 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        # defaults.create_defaults()
+        # need to add automatic parameters addition and usertypes_addition
     return app

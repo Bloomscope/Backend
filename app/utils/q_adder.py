@@ -1,6 +1,6 @@
 import json
-from ..utils.decorators import current_user_proxy_obj as current_user
 from ..model import Questions, db
+from .decorators import current_user_proxy_obj as current_user
 
 
 '''
@@ -71,4 +71,10 @@ def add_questions(f):
     db.session.add(new_question)
     db.session.commit()
     '''
-    pass
+    quests = json.loads(f.decode('utf-8'))['data']
+    for quest in quests:
+        new_question = Questions(question=quest['question'], options=quest['options'], ans=quest['ans'],\
+             marks=quest['marks'], explanation=quest['explanation'], param_id=quest['param_id'], \
+                 added_by_id=current_user().id)
+        db.session.add(new_question)
+    db.session.commit()

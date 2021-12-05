@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from ..utils.decorators import *
 from ..model import *
+from ..utils import q_adder
+from .. import defaults
 
 
 admin_dash = Blueprint('admin_dash', __name__)
@@ -85,3 +87,19 @@ def get_tokens():
         data = Token.query.all()
         resp['data'] = [i.as_dict() for i in data]
     return jsonify(resp)
+
+
+@admin_dash.route('/api/add_questions', methods=['POST'])
+@admin_required()
+def add_questions():
+    file = request.files['file']
+    q_adder.add_questions(file.read())
+    return jsonify(msg='ok')
+
+
+# ignore this
+@admin_dash.route('/get')
+def test_get():
+    defaults.create_defaults()
+    return jsonify(msg='ok')
+

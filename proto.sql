@@ -180,4 +180,4 @@ create table if not exists `token` (
     primary key(`id`),
     foreign key(`test_id`) references `test`(`id`),
     foreign key(`user_id`) references `user`(`id`)
-)
+);

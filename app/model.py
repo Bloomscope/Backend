@@ -126,14 +126,15 @@ class Test(db.Model):
 class Questions(db.Model):
     __tablename__ = 'questions'
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
-    question = db.Column(db.Text, nullable=False)
+    question = db.Column(db.PickleType, nullable=False)
     options = db.Column(db.PickleType, nullable=False)
     ans = db.Column(db.String(5), nullable=False)
     explanation = db.Column(db.Text)
+    marks = db.Column(db.Integer, nullable=False)
     has_asked = db.Column(db.Boolean, default=False)
     param_id = db.Column(db.INTEGER, db.ForeignKey('parameters.id'), nullable=False)
     added_by_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
-    asked_on = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
+    asked_on = db.Column(GUID(), db.ForeignKey('test.id'), default=None)
 
     def as_dict(self):
         return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
