@@ -1,8 +1,9 @@
 from flask import Blueprint, request, jsonify
 from ..utils.decorators import *
 from ..model import *
-from ..utils import q_adder
-from .. import defaults
+from ..utils import q_adder, qpicker
+# from .. import defaults
+import uuid
 
 
 admin_dash = Blueprint('admin_dash', __name__)
@@ -97,9 +98,22 @@ def add_questions():
     return jsonify(msg='ok')
 
 
-# ignore this
-@admin_dash.route('/get')
-def test_get():
-    defaults.create_defaults()
-    return jsonify(msg='ok')
+@admin_dash.route('/api/schedule_test')
+def schedule_test():
+    test_id = uuid.uuid4().__str__()
+    res = qpicker.get_questions()
+    data = request.get_json(force=True)
+    test_name = data['test_name']
+    duration = int(data['duration']) # in minutes
+    conducted_on = data['conducted_on']
+    ends_after = int(data['ends_after']) #no of days
+
+    new_test = Test(id=test_id, name=test_name, conducted_on=conducted_on, questions=res, durations=duration)
+    new_test.populate(days=ends_after)
+    db.session.add(new_test)
+    db.session.flush()
+    db.session.commit()
+
+    return jsonify({'test_id': test_id, 'starts_on': new_test.conducted_on, 'ends_on': new_test.ends_on, \
+        'duration': new_test.durations})
 

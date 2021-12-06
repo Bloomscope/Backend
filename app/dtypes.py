@@ -44,8 +44,3 @@ def org_id():
     Return's Unique Organization id of 8 bytes
     '''
     return int(hashlib.md5(uuid.uuid4().bytes).hexdigest(),16)%(10**8)
-
-
-import datetime
-
-print(datetime.datetime.now()+datetime.timedelta(10))
