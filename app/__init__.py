@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 import flask_cors
 import flask_bcrypt
-# from . import defaults as defaults
 
 
 db = SQLAlchemy()
@@ -21,12 +20,14 @@ def create_app():
     from .errors import routes as error_handlers
     from .students import routes as student_routes
     from .parents import routes as parent_routes
+    from .utils import bg_jobs as jobs
 
     app.register_blueprint(auth_routes.auth)
     app.register_blueprint(admin_dash_routes.admin_dash)
     app.register_blueprint(error_handlers.errors)
     app.register_blueprint(student_routes.student)
     app.register_blueprint(parent_routes.parent)
+    app.register_blueprint(jobs.job)
 
     db.init_app(app)
     jwt.init_app(app)
@@ -35,6 +36,5 @@ def create_app():
 
     with app.app_context():
         db.create_all()
-        # defaults.create_defaults()
-        # need to add automatic parameters addition and usertypes_addition
     return app
+

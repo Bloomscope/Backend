@@ -95,17 +95,31 @@ def get_tokens():
 def add_questions():
     file = request.files['file']
     q_adder.add_questions(file.read())
-    return jsonify(msg='ok')
+    return jsonify(msg='ok', errors=None)
 
 
-@admin_dash.route('/api/schedule_test')
+@admin_dash.route('/api/add_question', methods=['POST'])
+@admin_required()
+def add_question():
+    quest = request.get_json(force=True)
+    new_question = Questions(question=quest['question'], options=quest['options'], ans=quest['ans'],\
+             marks=quest['marks'], explanation=quest['explanation'], param_id=quest['param_id'], \
+                 added_by_id=current_user_proxy_obj().id)
+    db.session.add(new_question)
+    db.session.flush()
+    db.session.commit()
+    return jsonify({'question_id': new_question.id, 'msg': 'success'})
+
+
+@admin_dash.route('/api/schedule_test', methods=['POST'])
+@admin_required()
 def schedule_test():
     test_id = uuid.uuid4().__str__()
     res = qpicker.get_questions()
     data = request.get_json(force=True)
     test_name = data['test_name']
     duration = int(data['duration']) # in minutes
-    conducted_on = data['conducted_on']
+    conducted_on = datetime.datetime.strptime(data['conducted_on'], '%Y-%m-%d %H:%M:%S.%f')
     ends_after = int(data['ends_after']) #no of days
 
     new_test = Test(id=test_id, name=test_name, conducted_on=conducted_on, questions=res, durations=duration)
