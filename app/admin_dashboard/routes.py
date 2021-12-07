@@ -118,15 +118,13 @@ def add_question():
 @admin_required()
 def schedule_test():
     test_id = uuid.uuid4().__str__()
-    res = qpicker.get_questions()
     data = request.get_json(force=True)
+    res = qpicker.get_questions(data['parameters'])
     test_name = data['test_name']
     duration = int(data['duration']) # in minutes
-    conducted_on = datetime.datetime.strptime(data['conducted_on'], '%Y-%m-%d %H:%M:%S.%f')
-    ends_after = int(data['ends_after']) #no of days
-
-    new_test = Test(id=test_id, name=test_name, conducted_on=conducted_on, questions=res, durations=duration)
-    new_test.populate(days=ends_after)
+    conducted_on = int(data['conducted_on'])
+    ends_after = int(data['ends_after'])
+    new_test = Test(id=test_id, name=test_name, conducted_on=conducted_on, questions=res, durations=duration, ends_on=ends_after)
     db.session.add(new_test)
     db.session.flush()
     db.session.commit()

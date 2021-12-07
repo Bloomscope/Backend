@@ -4,10 +4,13 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from .config import SECRET_KEY
 from .dtypes import *
 import uuid
+from sqlalchemy import event
+from .utils import bg_jobs
 
 
 class UsersType(db.Model):
     ___tablename__ = 'users_type'
+
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     type = db.Column(db.String(8), nullable=False) # student or user, teacher, admin
     access_level = db.Column(db.INTEGER, default=1) # 1 = user, 2 = teacher, 3 = admin
@@ -16,6 +19,7 @@ class UsersType(db.Model):
 
 class Plans(db.Model):
     __tablename__ = 'plans'
+
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     plan = db.Column(db.String(15), nullable=False, unique=True) # plan type. ex: gold for 3 months, etc
     validity = db.Column(db.INTEGER, nullable=False) # plan validity in days
@@ -24,6 +28,7 @@ class Plans(db.Model):
 
 class Organization(db.Model):
     __tablename__ = 'organization'
+
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     added_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     name = db.Column(db.String(50), nullable=False)
@@ -34,6 +39,7 @@ class Organization(db.Model):
 
 class User(db.Model):
     __tablename__ = 'user'
+
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     registered_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     fname = db.Column(db.String(20), nullable=False)
@@ -54,9 +60,9 @@ class User(db.Model):
     results = db.relationship('Results', backref='user', lazy=True)
     announcements = db.relationship('Announcements', backref='user', lazy=True)
     complains = db.relationship('Complain', backref='user', lazy=True)
-    Suggestions = db.relationship('Suggestions', backref='user', lazy=True)
-    attempts_tracker = db.relationship('TestAttempts', backref='user', lazy=True)
+    suggestions = db.relationship('Suggestions', backref='user', lazy=True)
     tokens = db.relationship('Token', backref='user', lazy=True)
+    tests_tracker = db.relationship('TestSchedule', backref='user', lazy=True)
 
     def as_dict(self):
         return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
@@ -64,6 +70,7 @@ class User(db.Model):
 
 class Subscription(db.Model):
     __tablename__ = 'subscription'
+
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     subscribed_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     expires_on = db.Column(db.DateTime, nullable=False)
@@ -73,6 +80,7 @@ class Subscription(db.Model):
 
 class Parent(db.Model):
     __tablename__ = 'parent'
+
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     registered_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     fname = db.Column(db.String(20), nullable=False)
@@ -92,35 +100,50 @@ class Parent(db.Model):
 
 class Parent_Child(db.Model):
     __tablename__ = 'parent_child'
+
     parent_id = db.Column(GUID(), db.ForeignKey('parent.id', ondelete='CASCADE'), primary_key=True, nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True, nullable=False)
 
 
 class Parameters(db.Model):
     __tablename__ = 'parameters'
+
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     param_name = db.Column(db.String(32), unique=True, nullable=False)
     mapped = db.relationship('Questions', backref='parameters', lazy=True)
     suggestions = db.relationship('Suggestions', backref='parameters', lazy=True)
 
 
+class TestSchedule(db.Model):
+    __tablename__ = 'testschedule'
+
+    id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
+    attempted_on = db.Column(db.DateTime, nullable=True)
+    starts_on = db.Column(db.DateTime, nullable=True)
+    ends_on = db.Column(db.DateTime, nullable=True)
+    is_active = db.Column(db.Boolean, default=False)
+    has_attempted = db.Column(db.Boolean, default=False)
+    user_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
+    test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
+
+    def as_dict(self):
+        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
+
+
 class Test(db.Model):
-    # add scheduler to make test active and end, trigger to create a test with all questions 
     __tablename__ = 'test'
+
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = db.Column(db.String(32), nullable=False, unique=True)
-    conducted_on = db.Column(db.DateTime, nullable=False)
+    conducted_on = db.Column(db.Integer, nullable=False)
     questions = db.Column(db.PickleType, nullable=True)
     durations = db.Column(db.INTEGER, nullable=False)
-    ends_on = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
+    ends_on = db.Column(db.Integer, nullable=False)
     is_active = db.Column(db.Boolean, default=False)
     tracks = db.relationship('Questions', backref='test', lazy=True)
     res_tracks = db.relationship('Results', backref='test', lazy=True)
-    attempts_tracker = db.relationship('TestAttempts', backref='test', lazy=True)
     tokens = db.relationship('Token', backref='test', lazy=True)
-
-    def populate(self, days=10):
-        self.ends_on = self.conducted_on+datetime.timedelta(days)
+    test_schedules = db.relationship('TestSchedule', backref='test', lazy=True)
 
     def as_dict(self):
         return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
@@ -128,6 +151,7 @@ class Test(db.Model):
 
 class Questions(db.Model):
     __tablename__ = 'questions'
+
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     question = db.Column(db.PickleType, nullable=False)
     options = db.Column(db.PickleType, nullable=False)
@@ -145,6 +169,7 @@ class Questions(db.Model):
 
 class Results(db.Model):
     __tablename__ = 'results'
+
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     completed_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
@@ -154,6 +179,7 @@ class Results(db.Model):
 
 class Announcements(db.Model):
     __tablename__ = 'announcements'
+
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     announced_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     title = db.Column(db.String(100), nullable=False)
@@ -166,6 +192,7 @@ class Announcements(db.Model):
 
 class Suggestions(db.Model):
     __tablename__ = 'suggestions'
+
     id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
     suggestion_name = db.Column(db.String(32), nullable=False, unique=True)
     param_id = db.Column(db.INTEGER, db.ForeignKey('parameters.id'), nullable=False)
@@ -178,6 +205,7 @@ class Suggestions(db.Model):
 
 class Complain(db.Model):
     __tablename__ = 'complain'
+
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     raised_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     ticket_id = db.Column(db.String(8), default=org_id())
@@ -186,15 +214,9 @@ class Complain(db.Model):
     raised_by = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
 
 
-class TestAttempts(db.Model):
-    __tablename__ = 'test_attempts'
-    test_id = db.Column(GUID(), db.ForeignKey('test.id'), primary_key=True, nullable=False)
-    user_id = db.Column(GUID(), db.ForeignKey('user.id'), primary_key=True, nullable=False)
-    attempted_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
-
-
 class Token(db.Model):
     __tablename__ = 'token'
+    
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     reason = db.Column(db.Text, nullable=False)
@@ -204,3 +226,9 @@ class Token(db.Model):
 
     def as_dict(self):
         return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
+
+
+@event.listens_for(Test, 'after_insert')
+def scheduler_event(mapper, connection, target):
+    test_id = target.id
+    bg_jobs.scheduler.add_job(bg_jobs.schedule_test, args=[test_id, target.conducted_on, target.ends_on])

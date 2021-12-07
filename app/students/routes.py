@@ -46,26 +46,9 @@ def new_token():
     return jsonify({'errors': None, 'status': 'success', 'id': new_token.id})
 
 
-@student.route('/api/get_report')
+@student.route('/api/get_tests')
 @jwt_required()
-def get_report():
-    tests = Test.query.all()
-    tests_lists = [(i.id, i.name) for i in tests]
-    res = {'data': []}
-    for i in tests_lists:
-        has_attempted = TestAttempts.query.filter_by(user_id=current_user().id).filter_by(test_id=i[0]).first() is not None
-        if has_attempted:
-            res['data'].append({'test_id': i[0], 'test_name': i[1], 'user_id': current_user().id, 'has_attempted': True})
-        else:
-            res['data'].append({'test_id': i[0], 'test_name': i[1], 'user_id': current_user().id, 'has_attempted': False})
-    return jsonify(res)
-
-
-@student.route('/api/active_tests')
-@jwt_required()
-def active_tests():
-    test = Test.query.filter_by(is_active=True).first().as_dict()
-    del test['questions']
-    return jsonify(test)
-
-
+def get_tests():
+    test = TestSchedule.query.filter_by(user_id=current_user().id).all()
+    resp = {'data': [i.as_dict() for i in test]}
+    return jsonify(resp)

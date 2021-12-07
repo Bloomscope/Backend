@@ -1,11 +1,12 @@
 from .. import db, model, create_app as app
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from sqlalchemy import func
 from flask import Blueprint
 from apscheduler.schedulers.background import BackgroundScheduler
 
 
 job = Blueprint('job', __name__)
+scheduler = BackgroundScheduler(daemon=True)
 
 
 def activate_test():
@@ -26,9 +27,19 @@ def deactivate_test():
         db.session.commit()
 
 
+def schedule_test(test_id, starts_on, ends_on):
+    with app().app_context():
+        users = model.User.query.all()
+        for user in users:
+            starts = user.registered_on + timedelta(starts_on)
+            ends = user.registered_on + timedelta(ends_on)
+            new_test = model.TestSchedule(starts_on=starts, ends_on=ends, test_id=test_id, user_id=user.id)
+            db.session.add(new_test)
+        db.session.commit()
+
+
 @job.before_app_first_request
 def initialize():
-    scheduler = BackgroundScheduler(daemon=True)
     scheduler.start()
     scheduler.add_job(activate_test ,'interval', minutes=1)
     scheduler.add_job(deactivate_test ,'interval', minutes=1)
