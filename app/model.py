@@ -122,6 +122,9 @@ class Test(db.Model):
     def populate(self, days=10):
         self.ends_on = self.conducted_on+datetime.timedelta(days)
 
+    def as_dict(self):
+        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
+
 
 class Questions(db.Model):
     __tablename__ = 'questions'

@@ -59,3 +59,13 @@ def get_report():
         else:
             res['data'].append({'test_id': i[0], 'test_name': i[1], 'user_id': current_user().id, 'has_attempted': False})
     return jsonify(res)
+
+
+@student.route('/api/active_tests')
+@jwt_required()
+def active_tests():
+    test = Test.query.filter_by(is_active=True).first().as_dict()
+    del test['questions']
+    return jsonify(test)
+
+

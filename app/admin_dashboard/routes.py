@@ -36,7 +36,10 @@ def get_users():
 @admin_required()
 def get_parent_info():
     uid = request.args.get('uid')
-    pid = Parent_Child.query.filter_by(user_id=uid).first().parent_id
+    if uid is None or not uid:
+        pid = Parent_Child.query.filter_by(user_id=uid).first().parent_id
+    else:
+        pid = Parent_Child.query.filter_by(user_id=current_user_proxy_obj().id).first().parent_id
     parent = Parent.query.filter_by(id=pid).first()
     return jsonify(parent.as_dict())
 
