@@ -18,7 +18,6 @@ inflection==0.3.1
 itsdangerous==2.0.1
 Jinja2==3.0.3
 MarkupSafe==2.0.1
-mysqlclient==2.1.0
 passlib==1.7.4
 pendulum==2.1.2
 py-buzz==1.0.3
