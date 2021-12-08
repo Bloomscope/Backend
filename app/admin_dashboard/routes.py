@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from ..utils.decorators import *
 from ..model import *
-from ..utils import q_adder, qpicker
+from ..utils import q_adder, qpicker, mass_reg
 import uuid
 
 
@@ -141,3 +141,10 @@ def get_all_tests():
         'data': [i.as_dict() for i in tests]
     }
     return jsonify(resp)
+
+
+@admin_dash.route('/api/mass_register', methods=['POST'])
+def mass_register():
+    file = request.files['file']
+    mass_reg.mass_register(file.read())
+    return jsonify(msg='ok')
