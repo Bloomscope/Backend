@@ -28,10 +28,8 @@ def student_info():
 @student.route('/api/get_suggestions')
 @jwt_required()
 def get_suggestions():
-    uid = request.args.get('id')
-    if uid is None or uid == '':
-        return jsonify({'user_id': uid, 'errors': 'invalid user id or invalid session'})
-    suggestions = Suggestions.query.filter_by(user_id=uid).all()
+    uid =current_user().id
+    suggestions = Suggestions.query.filter_by(student_id=uid).all()
     return jsonify({'user_id': uid, 'suggestions': [i.as_dict() for i in suggestions]})
 
 
