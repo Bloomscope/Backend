@@ -53,7 +53,7 @@ def get_tests():
     resp = {'data': []}
     for test in tests:
         data = test.as_dict()
-        data['name'] = Test.query.filter_by(id=test.id).first().name
+        data['name'] = Test.query.filter_by(id=test.test_id).first().name
         resp['data'].append(data)
     return jsonify(resp)
 

@@ -19,8 +19,8 @@ def get_user_info():
 @admin_dash.route('/api/get_users')
 @admin_required()
 def get_users():
-    page = request.args.get('page')
-    datas = User.query.order_by(User.registered_on.desc()).paginate(page=int(page), max_per_page=10, error_out=False)
+    # page = request.args.get('page')
+    datas = User.query.order_by(User.registered_on.desc()).paginate(page=int(1), max_per_page=10, error_out=False)
     data = {
         'total_pages': datas.pages,
         'has_next_page': datas.has_next,
