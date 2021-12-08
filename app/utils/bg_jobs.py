@@ -38,6 +38,18 @@ def schedule_test(test_id, starts_on, ends_on):
         db.session.commit()
 
 
+def create_test(user_id, registered_on):
+    with app().app_context():
+        print('\n\nhere')
+        tests = model.Test.query.all()
+        for test in tests:
+            starts = registered_on + timedelta(test.conducted_on)
+            ends = registered_on + timedelta(test.ends_on)
+            new_test = model.TestSchedule(starts_on=starts, ends_on=ends, test_id=test.id, user_id=user_id)
+            db.session.add(new_test)
+        db.session.commit()
+
+
 @job.before_app_first_request
 def initialize():
     scheduler.start()
