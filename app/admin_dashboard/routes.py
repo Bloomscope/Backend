@@ -144,6 +144,7 @@ def get_all_tests():
 
 
 @admin_dash.route('/api/mass_register', methods=['POST'])
+@admin_required()
 def mass_register():
     file = request.files['file']
     mass_reg.mass_register(file.read())
