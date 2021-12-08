@@ -25,3 +25,10 @@ def child_info():
     if Parent_Child.query.filter_by(parent_id=current_user().id).first().user_id != child_id:
         return jsonify(status='error', msg='Parent and child are not related')
     return jsonify(User.query.filter_by(id=child_id).first().as_dict())
+
+
+@parent.route('/api/get_child_suggestion')
+@jwt_required()
+def get_child_suggestion():
+    cid = Parent_Child.query.filter_by(parent_id=current_user().id).first()
+    return jsonify({'data': [i.as_dict() for i in Suggestions.query.filter_by(student_id=cid).all()]})

@@ -40,7 +40,6 @@ def schedule_test(test_id, starts_on, ends_on):
 
 def create_test(user_id, registered_on):
     with app().app_context():
-        print('\n\nhere')
         tests = model.Test.query.all()
         for test in tests:
             starts = registered_on + timedelta(test.conducted_on)
