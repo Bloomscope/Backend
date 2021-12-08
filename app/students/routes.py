@@ -53,9 +53,12 @@ def get_tests():
     resp = {'data': [i.as_dict() for i in test]}
     return jsonify(resp)
 
-# @student.route('/api/get_test_name')
-# @jwt_required()
-# def get_tests():
-#     test = Test.query.filter_by(user_id=current_user().id)
-#     resp = {'data': [i.as_dict() for i in test]}
-#     return jsonify(resp)
+
+@student.route('/api/test_info')
+@jwt_required()
+def test_info():
+    test_id = request.args.get('test_id')
+    test = Test.query.filter_by(id=test_id).first()
+    test = test.as_dict()
+    del test['questions']
+    return jsonify(test)

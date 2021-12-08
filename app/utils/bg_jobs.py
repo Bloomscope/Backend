@@ -3,6 +3,7 @@ from datetime import date, datetime, timedelta
 from sqlalchemy import func
 from flask import Blueprint
 from apscheduler.schedulers.background import BackgroundScheduler
+from ..defaults import create_defaults
 
 
 job = Blueprint('job', __name__)
@@ -29,7 +30,7 @@ def deactivate_test():
 
 def schedule_test(test_id, starts_on, ends_on):
     with app().app_context():
-        users = model.User.query.all()
+        users = model.User.query.filter_by(user_type_id=1).all()
         for user in users:
             starts = user.registered_on + timedelta(starts_on)
             ends = user.registered_on + timedelta(ends_on)
@@ -40,6 +41,7 @@ def schedule_test(test_id, starts_on, ends_on):
 
 @job.before_app_first_request
 def initialize():
+    create_defaults()
     scheduler.start()
     scheduler.add_job(activate_test ,'interval', minutes=1)
     scheduler.add_job(deactivate_test ,'interval', minutes=1)

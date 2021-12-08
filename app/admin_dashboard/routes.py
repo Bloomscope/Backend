@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify
 from ..utils.decorators import *
 from ..model import *
 from ..utils import q_adder, qpicker
-# from .. import defaults
 import uuid
 
 
@@ -132,3 +131,13 @@ def schedule_test():
     return jsonify({'test_id': test_id, 'starts_on': new_test.conducted_on, 'ends_on': new_test.ends_on, \
         'duration': new_test.durations})
 
+
+@admin_dash.route('/api/get_all_tests')
+def get_all_tests():
+    tests = Test.query.all()
+    del tests['questions']
+    resp = {
+        'tests': len(tests),
+        'data': [i.as_dict() for i in tests]
+    }
+    return jsonify(resp)
