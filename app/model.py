@@ -36,6 +36,9 @@ class Organization(db.Model):
     address = db.Column(db.String(50), nullable=False)
     registered_by = db.relationship('User', backref='organization', lazy=True)
 
+    def as_dict(self):
+        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
+
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -176,6 +179,9 @@ class Results(db.Model):
     responses = db.Column(db.PickleType, nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 
+    def as_dict(self):
+        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
+
 
 class Announcements(db.Model):
     __tablename__ = 'announcements'
@@ -212,6 +218,9 @@ class Complain(db.Model):
     status = db.Column(db.String(32), default='Pending') # pending, completed, in review
     reason = db.Column(db.Text, nullable=False)
     raised_by = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
+
+    def as_dict(self):
+        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
 
 
 class Token(db.Model):
