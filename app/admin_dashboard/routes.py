@@ -75,7 +75,7 @@ def add_suggestions():
     db.session.add(new_suggestion)
     db.session.flush()
     db.session.commit()
-    return jsonify({'status': 'success', 'suggestion_id': new_suggestion.id})
+    return jsonify({'status': 'success', 'suggestion_id': new_suggestion.id, 'to_user': new_suggestion.student_id})
 
 
 @admin_dash.route('/api/get_tokens')

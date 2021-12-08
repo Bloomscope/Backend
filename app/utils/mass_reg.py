@@ -4,9 +4,34 @@ import csv
 # from .. import db, bcrypt
 
 
+'''
+        format
+
+users: [
+    {
+        fname: required
+        mname: optional
+        lname = required
+        dob = required [any format]
+        email = required
+        password = required [ex: 123qweas  in plain text]
+        phone = 7406177090
+    },
+    {
+        fname: required
+        mname: optional
+        lname = required
+        dob = required [any format]
+        email = required
+        password = required [ex: 123qweas  in plain text]
+        phone = 7406177090
+    }
+
+]
+'''
+
 class MassRegister:
-    def __init__(self, mime, stream) -> None:
-        self.mime = mime
+    def __init__(self, stream) -> None:
         self.stream = stream
         self.response = {
             'errors': None,

@@ -49,8 +49,12 @@ def new_token():
 @student.route('/api/get_tests')
 @jwt_required()
 def get_tests():
-    test = TestSchedule.query.filter_by(user_id=current_user().id).all()
-    resp = {'data': [i.as_dict() for i in test]}
+    tests = TestSchedule.query.filter_by(user_id=current_user().id).all()
+    resp = {'data': []}
+    for test in tests:
+        data = test.as_dict()
+        data['name'] = Test.query.filter_by(id=test.id).first().name
+        resp['data'].append(data)
     return jsonify(resp)
 
 
