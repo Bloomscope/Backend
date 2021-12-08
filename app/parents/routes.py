@@ -8,6 +8,7 @@ parent = Blueprint('parent', __name__)
 
 
 @parent.route('/api/get_all_childs')
+@jwt_required()
 def get_all_childs():
     childs = Parent_Child.query.filter_by(parent_id=current_user().id).all()
     resp = {
@@ -18,6 +19,7 @@ def get_all_childs():
 
 
 @parent.route('/api/child_info')
+@jwt_required()
 def child_info():
     child_id = request.args.get('child_id')
     if Parent_Child.query.filter_by(parent_id=current_user().id).first().user_id != child_id:
