@@ -20,7 +20,8 @@ def get_user_info():
 @admin_required()
 def get_users():
     # page = request.args.get('page')
-    datas = User.query.order_by(User.registered_on.desc()).paginate(page=int(1), max_per_page=10, error_out=False)
+    # datas = User.query.order_by(User.registered_on.desc()).paginate(page=int(1), max_per_page=10, error_out=False)
+    datas = User.query.order_by(User.registered_on.desc()).paginate(page=1, max_per_page=1000, error_out=False)
     data = {
         'total_pages': datas.pages,
         'has_next_page': datas.has_next,
