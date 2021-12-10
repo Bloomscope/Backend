@@ -149,3 +149,25 @@ def mass_register():
     file = request.files['file']
     mass_reg.mass_register(file.read())
     return jsonify(msg='ok')
+
+
+@admin_dash.route('/api/dashboard')
+@admin_required()
+def dashboard():
+    users = User.query.all()
+    tests = Test.query.all()
+    test_data = []
+    for test in tests:
+        attempted = TestSchedule.query.filter_by(test_id=test.id).filter_by(has_attempted=True).all()
+        total_registered = TestSchedule.query.filter_by(test_id=test.id).all()
+        test_data.append({
+            "test_id": test.id,
+            "attempted": len(attempted),
+            "total_registered": len(total_registered)
+        })
+    resp = {
+        "users_registered": len(users),
+        "tests": len(tests),
+        "test_data": test_data
+    }
+    return jsonify(resp)
