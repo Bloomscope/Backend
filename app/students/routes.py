@@ -3,6 +3,7 @@ from ..model import *
 from flask_jwt_extended import jwt_required
 from ..utils.decorators import current_user_proxy_obj as current_user
 from datetime import datetime
+from ..utils import evaluator
 
 
 student = Blueprint('student', __name__)
@@ -71,3 +72,11 @@ def test_info():
     test = test.as_dict()
     del test['questions']
     return jsonify(test)
+
+
+@student.route('/api/eval_test', methods=['POST'])
+@jwt_required()
+def eval_test():
+    data = request.get_json(force=True)
+    resp = evaluator.Eval(data).evaluate()
+    return jsonify(resp)
