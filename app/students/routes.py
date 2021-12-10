@@ -80,3 +80,21 @@ def eval_test():
     data = request.get_json(force=True)
     resp = evaluator.Eval(data).evaluate()
     return jsonify(resp)
+
+
+@student.route('/api/get_results')
+@jwt_required()
+def get_results():
+    results = Results.query.filter_by(user_id=current_user().id).all()
+    resp = {'results': [i.as_dict() for i in results]}
+    return jsonify(resp)
+
+
+@student.route('/api/get_result')
+@jwt_required()
+def get_result():
+    test_id = request.args.get('test_id')
+    if test_id is None:
+        return jsonify(errors='test_id not given')
+    result = Results.query.filter_by(test_id=test_id).filter_by(user_id=current_user().id).first()
+    return jsonify(result.as_dict())

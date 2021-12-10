@@ -1,5 +1,5 @@
 from .. import model, db, create_app as app
-import json
+from .decorators import current_user_proxy_obj as current_user
 
 
 '''
@@ -10,6 +10,8 @@ import json
     "quiz_data": [
         {
             "question_id": question_id,
+            "param_id": id,
+            "param_name": param_name,
             "user_choice": 'options'
         }
     ]
@@ -19,8 +21,7 @@ import json
 
 class Eval:
     def __init__(self, data):
-        print(type(data))
-        self.data = data#json.loads(data)
+        self.data = data
         self.total_marks = 0
         self.marks_scored = 0
         self.test_id = None
@@ -33,8 +34,17 @@ class Eval:
         self.test_id = self.data['test_id']
         self.has_negative_marks = self.data['has_negative_marks']
         self.total_questions = len(self.data['quiz_data'])
+    
+    def __write_results(self):
+        with app().app_context():
+            new_result = model.Results(test_id=self.test_id, responses=self.resp, user_id=current_user().id)
+            db.session.add(new_result)
+            db.session.commit()
 
     def evaluate(self):
+        '''
+        add parameter wise result calculation
+        '''
         self.__pre_process()
         with app().app_context():
             for question in self.data['quiz_data']:
@@ -48,7 +58,9 @@ class Eval:
                         'total_marks': quest.marks,
                         'marks_received': quest.marks,
                         'user_choice': question['user_choice'],
-                        'correct_ans': quest.ans
+                        'correct_ans': quest.ans,
+                        'param_id': question['param_id'],
+                        'param_name': question['param_name']
                     })
                 else:
                     self.total_marks += quest.marks
@@ -57,11 +69,14 @@ class Eval:
                         'total_marks': quest.marks,
                         'marks_received': 0,
                         'user_choice': question['user_choice'],
-                        'correct_ans': quest.ans
+                        'correct_ans': quest.ans,
+                        'param_id': question['param_id'],
+                        'param_name': question['param_name']
                     })
         self.resp['test_id'] = self.test_id
         self.resp['total_marks'] = self.total_marks
         self.resp['result_quest'] = f'{self.correctly_answered}/{self.total_questions}'
         self.resp['result_marks'] = f'{self.marks_scored}/{self.total_marks}'
+        self.__write_results()
     
         return self.resp

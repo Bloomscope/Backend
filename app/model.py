@@ -176,6 +176,7 @@ class Results(db.Model):
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     completed_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
+    # rename responses to result [store result resp here]
     responses = db.Column(db.PickleType, nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 
