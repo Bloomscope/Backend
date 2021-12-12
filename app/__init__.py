@@ -21,6 +21,7 @@ def create_app():
     from .students import routes as student_routes
     from .parents import routes as parent_routes
     from .utils import bg_jobs as jobs
+    from .payments import routes as payment_routes
 
     app.register_blueprint(auth_routes.auth)
     app.register_blueprint(admin_dash_routes.admin_dash)
@@ -28,6 +29,7 @@ def create_app():
     app.register_blueprint(student_routes.student)
     app.register_blueprint(parent_routes.parent)
     app.register_blueprint(jobs.job)
+    app.register_blueprint(payment_routes.payment)
 
     db.init_app(app)
     jwt.init_app(app)
