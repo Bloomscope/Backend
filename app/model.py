@@ -6,6 +6,7 @@ from .dtypes import *
 import uuid
 from sqlalchemy import event
 from .utils import bg_jobs
+from datetime import datetime, timedelta
 
 
 class UsersType(db.Model):
@@ -230,7 +231,7 @@ class Token(db.Model):
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     reason = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), default='Pending')
+    status = db.Column(db.String(20), default='Pending') #status = pending, acccepted, rejected
     test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
 
@@ -248,3 +249,16 @@ def scheduler_event(mapper, connection, target):
 def create_tests(mapper, connection, target):
     user_id = target.id
     bg_jobs.scheduler.add_job(bg_jobs.create_test, args=[user_id, target.registered_on])
+
+
+@event.listens_for(Token, 'after_update')
+def reschedule_test(mapper, connection, target):
+    if target.status == 'approved':
+        test = TestSchedule.query.filter_by(user_id=target.user_id).filter_by(test_id=target.test_id).first()
+        now = datetime.now()
+        starts = now + timedelta(0)
+        ends = now + timedelta(7)
+        test.starts_on = starts
+        test.ends_on = ends
+        db.session.commit()
+    

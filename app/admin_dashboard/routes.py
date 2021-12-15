@@ -79,20 +79,6 @@ def add_suggestions():
     return jsonify({'status': 'success', 'suggestion_id': new_suggestion.id, 'to_user': new_suggestion.student_id})
 
 
-@admin_dash.route('/api/get_tokens')
-@admin_required()
-def get_tokens():
-    uid = request.args.get('uid')
-    resp = {}
-    if uid is not None:
-        data = Token.query.filter_by(user_id=uid).all()
-        resp['data'] = [i.as_dict() for i in data]
-    else:
-        data = Token.query.all()
-        resp['data'] = [i.as_dict() for i in data]
-    return jsonify(resp)
-
-
 @admin_dash.route('/api/add_questions', methods=['POST'])
 @admin_required()
 def add_questions():

@@ -35,17 +35,6 @@ def get_suggestions():
     return jsonify({'user_id': uid, 'suggestions': [i.as_dict() for i in suggestions]})
 
 
-@student.route('/api/create_token', methods=['POST'])
-@jwt_required()
-def new_token():
-    data = request.get_json(force=True)
-    new_token = Token(**data, user_id=current_user().id)
-    db.session.add(new_token)
-    db.session.flush()
-    db.session.commit()
-    return jsonify({'errors': None, 'status': 'success', 'id': new_token.id})
-
-
 @student.route('/api/get_tests')
 @jwt_required()
 def get_tests():
