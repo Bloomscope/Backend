@@ -3,12 +3,17 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 import flask_cors
 import flask_bcrypt
+from celery import Celery
+from flask_mail import Mail
+from . config import CELERY_BROKER_URL
 
 
 db = SQLAlchemy()
 jwt = JWTManager()
 cors = flask_cors.CORS()
 bcrypt = flask_bcrypt.Bcrypt()
+mail = Mail()
+celery = Celery(__name__, broker=CELERY_BROKER_URL)
 
 
 def create_app():
@@ -22,6 +27,7 @@ def create_app():
     from .parents import routes as parent_routes
     from .utils import bg_jobs as jobs
     from .payments import routes as payment_routes
+    from .tokens import routes as token_routes
 
     app.register_blueprint(auth_routes.auth)
     app.register_blueprint(admin_dash_routes.admin_dash)
@@ -30,11 +36,14 @@ def create_app():
     app.register_blueprint(parent_routes.parent)
     app.register_blueprint(jobs.job)
     app.register_blueprint(payment_routes.payment)
+    app.register_blueprint(token_routes.token)
 
     db.init_app(app)
     jwt.init_app(app)
     cors.init_app(app)
     bcrypt.init_app(app)
+    mail.init_app(app)
+    celery.conf.update(app.config)
 
     with app.app_context():
         db.create_all()

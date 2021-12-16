@@ -261,4 +261,3 @@ def reschedule_test(mapper, connection, target):
         test.starts_on = starts
         test.ends_on = ends
         db.session.commit()
-    
