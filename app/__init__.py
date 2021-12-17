@@ -5,7 +5,7 @@ import flask_cors
 import flask_bcrypt
 from celery import Celery
 from flask_mail import Mail
-from . config import CELERY_BROKER_URL
+from .config import CELERY_BROKER_URL
 
 
 db = SQLAlchemy()
@@ -28,6 +28,7 @@ def create_app():
     from .utils import bg_jobs as jobs
     from .payments import routes as payment_routes
     from .tokens import routes as token_routes
+    from . import admin
 
     app.register_blueprint(auth_routes.auth)
     app.register_blueprint(admin_dash_routes.admin_dash)
@@ -43,6 +44,7 @@ def create_app():
     cors.init_app(app)
     bcrypt.init_app(app)
     mail.init_app(app)
+    admin.init_app(app, db)
     celery.conf.update(app.config)
 
     with app.app_context():

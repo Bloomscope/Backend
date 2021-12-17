@@ -6,7 +6,6 @@ from .dtypes import *
 import uuid
 from sqlalchemy import event
 from .utils import bg_jobs
-from datetime import datetime, timedelta
 
 
 class UsersType(db.Model):
@@ -254,10 +253,22 @@ def create_tests(mapper, connection, target):
 @event.listens_for(Token, 'after_update')
 def reschedule_test(mapper, connection, target):
     if target.status == 'approved':
-        test = TestSchedule.query.filter_by(user_id=target.user_id).filter_by(test_id=target.test_id).first()
-        now = datetime.now()
-        starts = now + timedelta(0)
-        ends = now + timedelta(7)
-        test.starts_on = starts
-        test.ends_on = ends
-        db.session.commit()
+        # test = TestSchedule.query.filter_by(user_id=target.user_id).filter_by(test_id=target.test_id).first()
+        now = datetime.datetime.now()
+        starts = now + datetime.timedelta(0)
+        ends = now + datetime.timedelta(7)
+        # test.starts_on = starts
+        # test.ends_on = ends
+        # db.session.commit()
+        test_schedule = TestSchedule.__table__
+        connection.execute(
+            test_schedule.update().
+            where(test_schedule.c.user_id==target.user_id).
+            where(test_schedule.c.test_id==target.test_id).
+            values(
+                {
+                    test_schedule.c.starts_on: starts,
+                    test_schedule.c.ends_on: ends
+                }
+            )
+        )
