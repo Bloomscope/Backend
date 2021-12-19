@@ -29,7 +29,12 @@ def login():
     user = User.query.filter_by(email=data['email']).first()
     if user and bcrypt.check_password_hash(user.password, data['password']):
         access_token = create_access_token(identity=user.email)
-        return jsonify({'is_logged_in': True, 'access_token': access_token, 'type': user.user_type_id, 'uid': user.id, 'errors': None})
+        is_parent = user.parent_child_rel
+        has_parent = True if len(is_parent) > 0 else False
+        parent_id = is_parent[0].parent_id if has_parent else None
+        return jsonify({'is_logged_in': True, 'access_token': access_token, \
+            'type': user.user_type_id, 'uid': user.id, 'errors': None,\
+                'has_parent': has_parent, 'parent_id': parent_id})
     user = Parent.query.filter_by(email=data['email']).first()
     if user and bcrypt.check_password_hash(user.password, data['password']):
         access_token = create_access_token(identity=user.email)

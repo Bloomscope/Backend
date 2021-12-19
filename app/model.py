@@ -253,13 +253,9 @@ def create_tests(mapper, connection, target):
 @event.listens_for(Token, 'after_update')
 def reschedule_test(mapper, connection, target):
     if target.status == 'approved':
-        # test = TestSchedule.query.filter_by(user_id=target.user_id).filter_by(test_id=target.test_id).first()
         now = datetime.datetime.now()
         starts = now + datetime.timedelta(0)
         ends = now + datetime.timedelta(7)
-        # test.starts_on = starts
-        # test.ends_on = ends
-        # db.session.commit()
         test_schedule = TestSchedule.__table__
         connection.execute(
             test_schedule.update().

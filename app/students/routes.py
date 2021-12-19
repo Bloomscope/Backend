@@ -39,6 +39,7 @@ def get_suggestions():
 @jwt_required()
 def get_tests():
     tests = TestSchedule.query.filter_by(user_id=current_user().id).all()
+    print(tests)
     resp = {'data': []}
     for test in tests:
         data = test.as_dict()
@@ -87,3 +88,21 @@ def get_result():
         return jsonify(errors='test_id not given')
     result = Results.query.filter_by(test_id=test_id).filter_by(user_id=current_user().id).first()
     return jsonify(result.as_dict())
+
+
+@student.route('/api/quiz', methods=['POST'])
+@jwt_required()
+def quiz():
+    data = request.get_json(force=True)
+    test = Test.query.filter_by(id=data['test_id']).first()
+    checks = TestSchedule.query.filter_by(user_id=current_user().id).filter_by(test_id=data['test_id']).first()
+    if not checks:
+        return jsonify(error = 'No test schedules found for the user.')
+    if checks.has_attempted:
+        return jsonify(error = 'user has already taken the test.')
+    resp = {
+        'test_id': test.id,
+        'questions': test.questions,
+        'duration': test.durations
+    }
+    return jsonify(resp)
