@@ -167,8 +167,11 @@ class Questions(db.Model):
     asked_on = db.Column(GUID(), db.ForeignKey('test.id'), default=None)
 
     def as_dict(self):
-        return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
-        
+        data = {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
+        del data['ans']
+        del data['explanation']
+        return data
+
 
 class Results(db.Model):
     __tablename__ = 'results'
