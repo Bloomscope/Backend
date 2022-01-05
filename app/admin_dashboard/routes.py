@@ -158,3 +158,21 @@ def dashboard():
         "test_data": test_data
     }
     return jsonify(resp)
+
+
+@admin_dash.route('/api/update_access', methods=['POST'])
+@admin_required()
+def update_access():
+    data = request.get_json(force=True)
+    resp = {'errors':[]}
+    user = User.query.filter_by(id=data['user_id']).first()
+    access_level = data['access_level']
+    if not user:
+        resp['errors'].append(f'User with id {data["user_id"]} does not exist.')
+    if access_level > 3 or access_level < 1:
+        resp['errors'].append(f'Invalid access level({access_level}) specified')
+    else:
+        user.user_type_id = int(access_level)
+        db.session.commit()
+        resp['msg'] = 'User acccess level has been updated'
+    return jsonify(resp)

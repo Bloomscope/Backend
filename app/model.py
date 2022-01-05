@@ -247,10 +247,10 @@ def scheduler_event(mapper, connection, target):
     bg_jobs.scheduler.add_job(bg_jobs.schedule_test, args=[test_id, target.conducted_on, target.ends_on])
 
 
-@event.listens_for(User, 'after_insert')
-def create_tests(mapper, connection, target):
-    user_id = target.id
-    bg_jobs.scheduler.add_job(bg_jobs.create_test, args=[user_id, target.registered_on])
+# @event.listens_for(User, 'after_insert')
+# def create_tests(mapper, connection, target):
+#     user_id = target.id
+#     bg_jobs.scheduler.add_job(bg_jobs.create_test, args=[user_id, target.registered_on])
 
 
 @event.listens_for(Token, 'after_update')

@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 SECRET_KEY = 'bloomscope@iitb'
 
@@ -17,8 +18,8 @@ SQLALCHEMY_DATABASE_URI = db_uri
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 SQLALCHEMY_ECHO = False
 
-JWT_ACCESS_LIFESPAN = {'hours': 24}
-JWT_REFRESH_LIFESPAN = {'days': 30}
+JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 JWT_SECRET_KEY = SECRET_KEY
 
 JSON_SORT_KEYS = False
