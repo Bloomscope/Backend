@@ -55,7 +55,7 @@ class User(db.Model):
     last_logged_in = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     is_verified = db.Column(db.Boolean, default=False)
     has_added_gaurdians = db.Column(db.Boolean, default=False)
-    has_changed_pass = db.Column(db.Boolean, defaut=False)
+    # has_changed_pass = db.Column(db.Boolean, defaut=False)
     user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False, default=1) #make default to 1
     organization_id = db.Column(GUID(), db.ForeignKey('organization.id', ondelete='CASCADE'), default=None)
     subscription = db.relationship('Subscription', backref='user', lazy=True)

@@ -1,5 +1,6 @@
 import bcrypt
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response, redirect, make_response
+from flask.templating import render_template
 from flask_jwt_extended.view_decorators import jwt_required
 from .. import db, bcrypt
 import datetime
@@ -93,3 +94,17 @@ def update_pass():
     user.has_changed_pass = True
     db.session.commit()
     return jsonify(status='success', msg='password has been reset successfully')
+
+
+@auth.route('/admin_dash_login', methods=['GET', 'POST'])
+def admin_dash_login():
+    resp = make_response(render_template('admin_login.html'))
+    if request.method == 'POST':
+        if (request.form
+                and request.form['username'] == 'admin'
+                and request.form['password'] == 'password'):
+                resp.set_cookie('is_logged_in', 'true')
+                return redirect('/admin')
+        else:
+            return Response('Access denied', 403)
+    return resp

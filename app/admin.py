@@ -1,23 +1,16 @@
-from flask_admin import Admin, AdminIndexView
+from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 from .model import *
-from flask import abort
-from .utils.decorators import current_user_proxy_obj as current_user
+from flask import request, redirect, url_for
 
 
 class AdminController(ModelView):
 
     # column_searchable_list = (User.email)
-
     def is_accessible(self):
-        # if current_user().email == 'test@test.com' or current_user.user_type_id == 3:
-        #     return True
-        # else:
-        #     return abort(403)
-        return True
-
-    def not_auth(self):
-        return abort(403)
+        if request.cookies.get('is_logged_in') == 'true':
+            return True
+        return redirect(url_for('auth.admin_login'))
 
 
 def init_app(app, db, name="Admin", url_prefix="/admin", **kwargs):
@@ -26,7 +19,7 @@ def init_app(app, db, name="Admin", url_prefix="/admin", **kwargs):
     akwargs = {
         "template_mode": "bootstrap3",
         "static_url_path": f"/templates/{url_prefix}",
-        "index_view": AdminIndexView(**vkwargs),
+        "index_view": AdminIndexView(),
     }
 
     admin = Admin(app, **akwargs)
