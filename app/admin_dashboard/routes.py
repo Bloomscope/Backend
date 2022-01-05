@@ -82,8 +82,10 @@ def add_suggestions():
 @admin_dash.route('/api/add_questions', methods=['POST'])
 @admin_required()
 def add_questions():
-    file = request.files['file']
-    q_adder.add_questions(file.read())
+    # file = request.files['file']
+    # q_adder.add_questions(file.read())
+    data = request.get_json(force=True)
+    q_adder.add_questions(data)
     return jsonify(msg='ok', errors=None)
 
 
