@@ -1,9 +1,10 @@
 import bcrypt
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended.view_decorators import jwt_required
 from .. import db, bcrypt
 import datetime
 from ..model import *
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 
 auth = Blueprint('auth', __name__)
@@ -32,15 +33,15 @@ def login():
         is_parent = user.parent_child_rel
         has_parent = True if len(is_parent) > 0 else False
         parent_id = is_parent[0].parent_id if has_parent else None
+        change_pass = True if not user.has_changed_pass else False
         return jsonify({'is_logged_in': True, 'access_token': access_token, \
             'type': user.user_type_id, 'uid': user.id, 'errors': None,\
-                'has_parent': has_parent, 'parent_id': parent_id})
+                'has_parent': has_parent, 'parent_id': parent_id, 'has_default_creds': change_pass})
     user = Parent.query.filter_by(email=data['email']).first()
     if user and bcrypt.check_password_hash(user.password, data['password']):
         access_token = create_access_token(identity=user.email)
         return jsonify({'is_logged_in': True, 'access_token': access_token, 'type': user.user_type_id, 'uid': user.id , 'errors': None})
     return jsonify({'is_logged_in': False, 'access_token': None, 'errors': 'email or password doesnt match'})
-
 
 
 @auth.route('/api/admin_login', methods=['POST'])
@@ -79,3 +80,16 @@ def register_parent():
         db.session.commit()
         return jsonify({'status': 'success', 'errors': None})
     return jsonify({'status': 'failed', 'errors': 'user not found'})
+
+
+@auth.route('/api/update_password', methods=['POST'])
+@jwt_required()
+def update_pass():
+    data = request.get_json(force=True)
+    user = User.query.filter_by(email=get_jwt_identity()).first()
+    if data['password'] != data['confirm_password']:
+        return jsonify(error='Passwords do not match')
+    user.password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+    user.has_changed_pass = True
+    db.session.commit()
+    return jsonify(status='success', msg='password has been reset successfully')
