@@ -29,3 +29,10 @@ RAZOR_PAY_SECRET = 'sNGOwgoYnUAO8n3SOlMsgLGR'
 
 # redis and celery config
 CELERY_BROKER_URL = 'redis://default:anirudhmp@redis-19076.c277.us-east-1-3.ec2.cloud.redislabs.com:19076'
+
+# Mail server config
+MAIL_SERVER = 'smtpout.secureserver.net'
+MAIL_PORT = 465
+MAIL_USE_SSL = True
+MAIL_USERNAME = 'anirudhmp@colabo.in'
+MAIL_PASSWORD = 'prathibhamm235'
