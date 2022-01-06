@@ -85,10 +85,9 @@ def register_parent():
 
 
 @auth.route('/api/update_password', methods=['POST'])
-@jwt_required()
 def update_pass():
     data = request.get_json(force=True)
-    user = User.query.filter_by(email=get_jwt_identity()).first()
+    user = User.query.filter_by(email=data['email']).first()
     if data['password'] != data['confirm_password']:
         return jsonify(error='Passwords do not match')
     user.password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
@@ -109,3 +108,33 @@ def admin_dash_login():
         else:
             return Response('Access denied', 403)
     return resp
+
+
+@auth.route('/forgot_password', methods=['POST'])
+def forgot_password():
+    data = request.get_json(force=True)
+    user = User.query.filter_by(email=data['email']).first()
+    if not user:
+        return jsonify(error=f'No user with email "{data["email"]}" found.')
+    reset_token = user.get_reset_token()
+    return jsonify({'status': 'success', 'email': data['email'], 'reset_token': reset_token})
+
+
+@auth.route('/verify_token', methods=['POST'])
+def verify_token():
+    data = request.get_json(force=True)
+    resp = {'errors': []}
+    try:
+        token = data['reset_token']
+        user_obj = User.verify_reset_token(token)
+        if user_obj:
+            resp['user_id'] = user_obj.id
+            resp['user_email'] = user_obj.email
+            resp['is_token_valid'] = True
+        else:
+            resp['user_id'] = None
+            resp['user_email'] = None
+            resp['is_token_valid'] = False
+    except Exception as e:
+        resp['errors'].append(e)
+    return jsonify(resp)

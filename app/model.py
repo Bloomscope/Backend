@@ -55,7 +55,7 @@ class User(db.Model):
     last_logged_in = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     is_verified = db.Column(db.Boolean, default=False)
     has_added_gaurdians = db.Column(db.Boolean, default=False)
-    # has_changed_pass = db.Column(db.Boolean, defaut=False)
+    has_changed_pass = db.Column(db.Boolean, defaut=False)
     user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False, default=1) #make default to 1
     organization_id = db.Column(GUID(), db.ForeignKey('organization.id', ondelete='CASCADE'), default=None)
     subscription = db.relationship('Subscription', backref='user', lazy=True)
@@ -70,6 +70,19 @@ class User(db.Model):
 
     def as_dict(self):
         return {col.name: str(getattr(self, col.name)) for col in self.__table__.columns}
+
+    def get_reset_token(self, expires_in_sec=900):
+        s = Serializer(SECRET_KEY, expires_in_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+    
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer(SECRET_KEY)
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
 
 
 class Subscription(db.Model):
