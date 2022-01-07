@@ -42,9 +42,6 @@ class Eval:
             db.session.commit()
 
     def evaluate(self):
-        '''
-        add parameter wise result calculation
-        '''
         self.__pre_process()
         all_params = set(i['param_name'] for i in self.data['quiz_data'])
         params = {i: {"param_name": i, "total_questions": 0, "correct_resp": 0} for i in all_params}

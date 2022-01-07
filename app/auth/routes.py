@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, Response, redirect, make_response
 import datetime
 from ..model import *
 from .. import db, bcrypt
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token
 from flask import render_template
 from ..mailer import send_informative_mail
 
@@ -35,7 +35,7 @@ def login():
         is_parent = user.parent_child_rel
         has_parent = True if len(is_parent) > 0 else False
         parent_id = is_parent[0].parent_id if has_parent else None
-        change_pass = True if not user.has_changed_pass else False
+        change_pass = False #True if not user.has_changed_pass else False
         return jsonify({'is_logged_in': True, 'access_token': access_token, \
             'type': user.user_type_id, 'uid': user.id, 'errors': None,\
                 'has_parent': has_parent, 'parent_id': parent_id, 'has_default_creds': change_pass})

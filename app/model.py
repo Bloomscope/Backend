@@ -55,7 +55,7 @@ class User(db.Model):
     last_logged_in = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     is_verified = db.Column(db.Boolean, default=False)
     has_added_gaurdians = db.Column(db.Boolean, default=False)
-    has_changed_pass = db.Column(db.Boolean, defaut=False)
+    # has_changed_pass = db.Column(db.Boolean, default=False)
     user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False, default=1) #make default to 1
     organization_id = db.Column(GUID(), db.ForeignKey('organization.id', ondelete='CASCADE'), default=None)
     subscription = db.relationship('Subscription', backref='user', lazy=True)
@@ -261,10 +261,10 @@ def scheduler_event(mapper, connection, target):
     bg_jobs.scheduler.add_job(bg_jobs.schedule_test, args=[test_id, target.conducted_on, target.ends_on])
 
 
-# @event.listens_for(User, 'after_insert')
-# def create_tests(mapper, connection, target):
-#     user_id = target.id
-#     bg_jobs.scheduler.add_job(bg_jobs.create_test, args=[user_id, target.registered_on])
+@event.listens_for(User, 'after_insert')
+def create_tests(mapper, connection, target):
+    user_id = target.id
+    bg_jobs.scheduler.add_job(bg_jobs.create_test, args=[user_id, target.registered_on])
 
 
 @event.listens_for(Token, 'after_update')

@@ -31,8 +31,9 @@ RAZOR_PAY_SECRET = 'sNGOwgoYnUAO8n3SOlMsgLGR'
 CELERY_BROKER_URL = 'redis://default:anirudhmp@redis-19076.c277.us-east-1-3.ec2.cloud.redislabs.com:19076'
 
 # Mail server config
-MAIL_SERVER = '<smtp server address>'
-MAIL_PORT = '<smtp port (default 465 but depends on provider)>'
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = '465'
 MAIL_USE_SSL = True
-MAIL_USERNAME = '<username>'
-MAIL_PASSWORD = '<password>'
+MAIL_USERNAME = 'connect@bloomscope.org'
+MAIL_PASSWORD = 'core#123'
+MAIL_DEFAULT_SENDER = 'BloomScope'

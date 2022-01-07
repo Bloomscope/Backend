@@ -3,6 +3,7 @@ from datetime import date, datetime, timedelta
 from sqlalchemy import func
 from flask import Blueprint
 from apscheduler.schedulers.background import BackgroundScheduler
+from .. import celery
 
 
 job = Blueprint('job', __name__)
