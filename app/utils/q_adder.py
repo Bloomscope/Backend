@@ -53,7 +53,8 @@ JSON Format
             ],
         'answer': 'A',
         'explanation': 'in cs its hello world!',
-        'parameters': [1,4,6]
+        'parameters': int,
+        'grade': int
         }
     }
 ]
@@ -75,6 +76,6 @@ def add_questions(f):
     for quest in quests:
         new_question = Questions(question=quest['question'], options=quest['options'], ans=quest['ans'],\
              marks=quest['marks'], explanation=quest['explanation'], param_id=quest['param_id'], \
-                 added_by_id=current_user().id)
+                 grade=quest['grade'], added_by_id=current_user().id)
         db.session.add(new_question)
     db.session.commit()

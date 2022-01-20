@@ -66,7 +66,7 @@ class User(db.Model):
     has_added_gaurdians = db.Column(db.Boolean, default=False)
     has_changed_pass = db.Column(db.Boolean, default=False)
     grades_id = db.Column(db.Integer, db.ForeignKey('grades.id', ondelete='CASCADE'), nullable=False)
-    user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False, default=1) #make default to 1
+    user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False, default=1)
     organization_id = db.Column(GUID(), db.ForeignKey('organization.id', ondelete='CASCADE'), default=None)
     subscription = db.relationship('Subscription', backref='user', lazy=True)
     parent_child_rel = db.relationship('Parent_Child', backref='user', lazy=True)
