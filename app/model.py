@@ -17,6 +17,15 @@ class UsersType(db.Model):
     users = db.relationship('User', backref='users_type', passive_deletes=True, lazy=True)
 
 
+class Grades(db.Model):
+    __tablename__ = 'grades'
+
+    id = db.Column(db.INTEGER, primary_key=True, autoincrement=True)
+    grade = db.Column(db.Integer, nullable=False)
+    users = db.relationship('User', backref='grades', lazy=True)
+    questions = db.relationship('Questions', backref='grades', lazy=True)
+
+
 class Plans(db.Model):
     __tablename__ = 'plans'
 
@@ -55,7 +64,8 @@ class User(db.Model):
     last_logged_in = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
     is_verified = db.Column(db.Boolean, default=False)
     has_added_gaurdians = db.Column(db.Boolean, default=False)
-    # has_changed_pass = db.Column(db.Boolean, default=False)
+    has_changed_pass = db.Column(db.Boolean, default=False)
+    grades_id = db.Column(db.Integer, db.ForeignKey('grades.id', ondelete='CASCADE'), nullable=False)
     user_type_id = db.Column(db.INTEGER, db.ForeignKey('users_type.id', ondelete='CASCADE'), nullable=False, default=1) #make default to 1
     organization_id = db.Column(GUID(), db.ForeignKey('organization.id', ondelete='CASCADE'), default=None)
     subscription = db.relationship('Subscription', backref='user', lazy=True)
@@ -176,6 +186,7 @@ class Questions(db.Model):
     explanation = db.Column(db.Text)
     marks = db.Column(db.Integer, nullable=False)
     has_asked = db.Column(db.Boolean, default=False)
+    grades_id = db.Column(db.Integer, db.ForeignKey('grades.id'), nullable=False)
     param_id = db.Column(db.INTEGER, db.ForeignKey('parameters.id'), nullable=False)
     added_by_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
     asked_on = db.Column(GUID(), db.ForeignKey('test.id'), default=None)
@@ -193,8 +204,7 @@ class Results(db.Model):
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     completed_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
-    # rename responses to result [store result resp here]
-    responses = db.Column(db.PickleType, nullable=False)
+    result = db.Column(db.PickleType, nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 
     def as_dict(self):
