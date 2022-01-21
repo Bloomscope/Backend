@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from ..model import *
 from ..utils.decorators import current_user_proxy_obj as current_user, admin_required
 from flask_jwt_extended import jwt_required
+from .. import celery
 
 
 token = Blueprint('token', __name__)
@@ -54,3 +55,20 @@ def create_token():
     db.session.flush()
     db.session.commit()
     return jsonify(token.as_dict())
+
+
+@token.route('/api/update_all', methods=['POST'])
+@admin_required()
+def update_all_tokens():
+    data = request.json(force=True)
+    action = data['action'] #accepted, rejected
+    update_all_tokens_at_once.delay(action=action)
+    return jsonify(msg='ok')
+
+
+@celery.task
+def update_all_tokens_at_once(**kwargs):
+    tokens = Token.query.filter_by(status='pending').all()
+    for token in tokens:
+        token.status = kwargs['action']
+    db.session.commit()

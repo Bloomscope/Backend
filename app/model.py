@@ -257,7 +257,7 @@ class Token(db.Model):
     id = db.Column(GUID(), primary_key=True, default=lambda: str(uuid.uuid4()))
     created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     reason = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), default='Pending') #status = pending, acccepted, rejected
+    status = db.Column(db.String(20), default='Pending') #status = pending, accepted, rejected
     test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
 
