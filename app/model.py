@@ -150,6 +150,7 @@ class TestSchedule(db.Model):
     ends_on = db.Column(db.DateTime, nullable=True)
     is_active = db.Column(db.Boolean, default=False)
     has_attempted = db.Column(db.Boolean, default=False)
+    grade = db.Column(db.Integer, nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
     test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
 

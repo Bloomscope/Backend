@@ -145,12 +145,13 @@ def mass_register():
 def dashboard():
     users = User.query.all()
     tests = Test.query.all()
+    grades = Grades.query.all()
     test_data = []
-    for test in tests:
-        attempted = TestSchedule.query.filter_by(test_id=test.id).filter_by(has_attempted=True).all()
-        total_registered = TestSchedule.query.filter_by(test_id=test.id).all()
+    for grade in grades:
+        attempted = TestSchedule.query.filter_by(grade=grade.id).filter_by(has_attempted=True).all()
+        total_registered = TestSchedule.query.filter_by(grade=grade.id).all()
         test_data.append({
-            "test_id": test.id,
+            "grade": grade.id,
             "attempted": len(attempted),
             "total_registered": len(total_registered)
         })

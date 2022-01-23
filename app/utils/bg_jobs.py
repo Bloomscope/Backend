@@ -34,7 +34,7 @@ def schedule_test(test_id, starts_on, ends_on):
         for user in users:
             starts = user.registered_on + timedelta(starts_on)
             ends = user.registered_on + timedelta(ends_on)
-            new_test = model.TestSchedule(starts_on=starts, ends_on=ends, test_id=test_id, user_id=user.id)
+            new_test = model.TestSchedule(starts_on=starts, ends_on=ends, test_id=test_id, user_id=user.id, grade=user.grade)
             db.session.add(new_test)
         db.session.commit()
 
