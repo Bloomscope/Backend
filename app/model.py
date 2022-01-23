@@ -24,6 +24,7 @@ class Grades(db.Model):
     grade = db.Column(db.Integer, nullable=False)
     users = db.relationship('User', backref='grades', lazy=True)
     questions = db.relationship('Questions', backref='grades', lazy=True)
+    tests = db.relationship('TestSchedule', backref='grades', lazy=True)
 
 
 class Plans(db.Model):
@@ -150,7 +151,7 @@ class TestSchedule(db.Model):
     ends_on = db.Column(db.DateTime, nullable=True)
     is_active = db.Column(db.Boolean, default=False)
     has_attempted = db.Column(db.Boolean, default=False)
-    grade = db.Column(db.Integer, nullable=False)
+    grade = db.Column(db.Integer, db.ForeignKey('grades.id'),nullable=False)
     user_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
     test_id = db.Column(GUID(), db.ForeignKey('test.id'), nullable=False)
 
@@ -187,7 +188,7 @@ class Questions(db.Model):
     explanation = db.Column(db.Text)
     marks = db.Column(db.Integer, nullable=False)
     has_asked = db.Column(db.Boolean, default=False)
-    grades_id = db.Column(db.Integer, db.ForeignKey('grades.id'), nullable=False)
+    grade = db.Column(db.Integer, db.ForeignKey('grades.id'), nullable=False)
     param_id = db.Column(db.INTEGER, db.ForeignKey('parameters.id'), nullable=False)
     added_by_id = db.Column(GUID(), db.ForeignKey('user.id'), nullable=False)
     asked_on = db.Column(GUID(), db.ForeignKey('test.id'), default=None)
