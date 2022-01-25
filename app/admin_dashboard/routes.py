@@ -1,3 +1,4 @@
+from crypt import methods
 from flask import Blueprint, request, jsonify
 from ..utils.decorators import *
 from ..model import *
@@ -94,7 +95,7 @@ def add_questions():
 def add_question():
     quest = request.get_json(force=True)
     new_question = Questions(question=quest['question'], options=quest['options'], ans=quest['ans'],\
-             marks=quest['marks'], explanation=quest['explanation'], param_id=quest['param_id'], \
+             marks=quest['marks'], grade=quest['grade'], explanation=quest['explanation'], param_id=quest['param_id'], \
                  added_by_id=current_user_proxy_obj().id)
     db.session.add(new_question)
     db.session.flush()
@@ -179,3 +180,13 @@ def update_access():
         db.session.commit()
         resp['msg'] = 'User acccess level has been updated'
     return jsonify(resp)
+
+
+@admin_dash.route('/api/create_organisation', methods=['POST'])
+@admin_required()
+def create_organisation():
+    data = request.get_json(force=True)
+    new_org = Organization(name=data['name'], address=['address'])
+    db.session.add(new_org)
+    db.session.commit()
+    return jsonify(msg='ok')
