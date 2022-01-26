@@ -25,6 +25,7 @@ class Grades(db.Model):
     users = db.relationship('User', backref='grades', lazy=True)
     questions = db.relationship('Questions', backref='grades', lazy=True)
     tests = db.relationship('TestSchedule', backref='grades', lazy=True)
+    test = db.relationship('Test', backref='grades', lazy=True)
 
 
 class Plans(db.Model):
@@ -169,6 +170,7 @@ class Test(db.Model):
     durations = db.Column(db.INTEGER, nullable=False)
     ends_on = db.Column(db.Integer, nullable=False)
     is_active = db.Column(db.Boolean, default=False)
+    grade = db.Column(db.Integer, db.ForeignKey('grades.id'),nullable=False)
     tracks = db.relationship('Questions', backref='test', lazy=True)
     res_tracks = db.relationship('Results', backref='test', lazy=True)
     tokens = db.relationship('Token', backref='test', lazy=True)
@@ -270,7 +272,7 @@ class Token(db.Model):
 @event.listens_for(Test, 'after_insert')
 def scheduler_event(mapper, connection, target):
     test_id = target.id
-    bg_jobs.scheduler.add_job(bg_jobs.schedule_test, args=[test_id, target.conducted_on, target.ends_on])
+    bg_jobs.scheduler.add_job(bg_jobs.schedule_test, args=[test_id, target.conducted_on, target.ends_on, target.grade])
 
 
 @event.listens_for(User, 'after_insert')
