@@ -30,11 +30,11 @@ def deactivate_test():
 
 def schedule_test(test_id, starts_on, ends_on, grade):
     with app().app_context():
-        users = model.User.query.filter_by(user_type_id=1).filter_by(grade=int(grade)).all()
+        users = model.User.query.filter_by(user_type_id=1).filter_by(grades_id=int(grade)).all()
         for user in users:
             starts = user.registered_on + timedelta(starts_on)
             ends = user.registered_on + timedelta(ends_on)
-            new_test = model.TestSchedule(starts_on=starts, ends_on=ends, test_id=test_id, user_id=user.id, grade=user.grade)
+            new_test = model.TestSchedule(starts_on=starts, ends_on=ends, test_id=test_id, user_id=user.id, grade=user.grades_id)
             db.session.add(new_test)
         db.session.commit()
 

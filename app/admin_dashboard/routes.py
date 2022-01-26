@@ -108,12 +108,13 @@ def add_question():
 def schedule_test():
     test_id = uuid.uuid4().__str__()
     data = request.get_json(force=True)
-    res = qpicker.get_questions(data['parameters'], grade=data['grade'])
+    res = qpicker.get_questions(data['parameters'],grade = data['grade'])
     test_name = data['test_name']
+    grades = data['grade']
     duration = int(data['duration']) # in minutes
     conducted_on = int(data['conducted_on'])
     ends_after = int(data['ends_after'])
-    new_test = Test(id=test_id, name=test_name, conducted_on=conducted_on, questions=res, durations=duration, ends_on=ends_after)
+    new_test = Test(id=test_id, name=test_name, conducted_on=conducted_on, questions=res, durations=duration, ends_on=ends_after,grade = grades)
     db.session.add(new_test)
     db.session.flush()
     db.session.commit()
