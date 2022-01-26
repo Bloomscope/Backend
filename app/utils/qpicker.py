@@ -3,12 +3,12 @@ from .. import model
 
 
 # take test_id as param and make asked_on true for selected questions
-def get_questions(json_data):
+def get_questions(json_data, grade):
     # note: u can schedule a test for a grade at once
     quest = {'questions': []}
     for param in json_data:
         param_id = int(param['id'])
-        question = model.Questions.query.filter_by(grade=int(param['grade'])).filter_by(has_asked=False).filter_by(param_id=param_id).limit(int(param['que'])).all()
+        question = model.Questions.query.filter_by(grade=int(grade)).filter_by(has_asked=False).filter_by(param_id=param_id).limit(int(param['que'])).all()
         quest['questions'].append({
             'param_id': param_id,
             'data': [j.as_dict() for j in question]

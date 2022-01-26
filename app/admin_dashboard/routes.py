@@ -108,7 +108,7 @@ def add_question():
 def schedule_test():
     test_id = uuid.uuid4().__str__()
     data = request.get_json(force=True)
-    res = qpicker.get_questions(data['parameters'])
+    res = qpicker.get_questions(data['parameters'], grade=data['grade'])
     test_name = data['test_name']
     duration = int(data['duration']) # in minutes
     conducted_on = int(data['conducted_on'])
