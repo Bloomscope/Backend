@@ -30,22 +30,22 @@ def deactivate_test():
 
 def schedule_test(test_id, starts_on, ends_on, grade):
     with app().app_context():
-        users = model.User.query.filter_by(user_type_id=1).filter_by(grade=int(grade)).all()
+        users = model.User.query.filter_by(user_type_id=1).filter_by(grades_id=int(grade)).all()
         for user in users:
             starts = user.registered_on + timedelta(starts_on)
             ends = user.registered_on + timedelta(ends_on)
-            new_test = model.TestSchedule(starts_on=starts, ends_on=ends, test_id=test_id, user_id=user.id, grade=user.grade)
+            new_test = model.TestSchedule(starts_on=starts, ends_on=ends, test_id=test_id, user_id=user.id, grade=user.grades_id)
             db.session.add(new_test)
         db.session.commit()
 
 
-def create_test(user_id, registered_on):
+def create_test(user_id, registered_on, grade):
     with app().app_context():
-        tests = model.Test.query.all()
+        tests = model.Test.query.filter_by(grade=grade).all()
         for test in tests:
             starts = registered_on + timedelta(test.conducted_on)
             ends = registered_on + timedelta(test.ends_on)
-            new_test = model.TestSchedule(starts_on=starts, ends_on=ends, test_id=test.id, user_id=user_id)
+            new_test = model.TestSchedule(starts_on=starts, ends_on=ends, test_id=test.id, user_id=user_id, grade=grade)
             db.session.add(new_test)
         db.session.commit()
 

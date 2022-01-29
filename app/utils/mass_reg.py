@@ -31,7 +31,8 @@ users: [
 '''
 
 def mass_register(stream):
-    data = json.loads(stream.decode('utf-8'))['users']
+    # data = json.loads(stream.decode('utf-8'))['users']
+    data = stream['users']
     for user in data:
         password = user.pop('password')
         dob = datetime.strptime(user.pop('dob'), '%Y-%m-%d')

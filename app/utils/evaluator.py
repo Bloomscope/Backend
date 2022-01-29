@@ -37,7 +37,7 @@ class Eval:
     
     def __write_results(self):
         with app().app_context():
-            new_result = model.Results(test_id=self.test_id, responses=self.resp, user_id=current_user().id)
+            new_result = model.Results(test_id=self.test_id, result=self.resp, user_id=current_user().id)
             db.session.add(new_result)
             db.session.commit()
 

@@ -22,7 +22,7 @@ def get_user_info():
 def get_users():
     # page = request.args.get('page')
     # datas = User.query.order_by(User.registered_on.desc()).paginate(page=int(1), max_per_page=10, error_out=False)
-    datas = User.query.order_by(User.registered_on.desc()).paginate(page=1, max_per_page=1000, error_out=False)
+    datas = User.query.filter(User.user_type_id != 3).order_by(User.registered_on.desc()).paginate(page=1, max_per_page=1000, error_out=False)
     data = {
         'total_pages': datas.pages,
         'has_next_page': datas.has_next,
@@ -113,7 +113,8 @@ def schedule_test():
     duration = int(data['duration']) # in minutes
     conducted_on = int(data['conducted_on'])
     ends_after = int(data['ends_after'])
-    new_test = Test(id=test_id, name=test_name, conducted_on=conducted_on, questions=res, durations=duration, ends_on=ends_after)
+    new_test = Test(id=test_id, name=test_name, conducted_on=conducted_on, questions=res, durations=duration,\
+        grade=data['grade'], ends_on=ends_after)
     db.session.add(new_test)
     db.session.flush()
     db.session.commit()
@@ -136,8 +137,9 @@ def get_all_tests():
 @admin_dash.route('/api/mass_register', methods=['POST'])
 @admin_required()
 def mass_register():
-    file = request.files['file']
-    mass_reg.mass_register(file.read())
+    # file = request.files['file']
+    data = request.get_json(force = True)
+    mass_reg.mass_register(data)
     return jsonify(msg='ok')
 
 
