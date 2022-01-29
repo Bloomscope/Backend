@@ -72,7 +72,7 @@ def add_questions(f):
     db.session.add(new_question)
     db.session.commit()
     '''
-    quests = json.loads(f.decode('utf-8'))['data']
+    quests = json.loads(f)['data']
     for quest in quests:
         new_question = Questions(question=quest['question'], options=quest['options'], ans=quest['ans'],\
              marks=quest['marks'], explanation=quest['explanation'], param_id=quest['param_id'], \
