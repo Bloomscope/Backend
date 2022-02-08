@@ -114,12 +114,7 @@ def schedule_test():
     duration = int(data['duration']) # in minutes
     conducted_on = int(data['conducted_on'])
     ends_after = int(data['ends_after'])
-<<<<<<< HEAD
-    new_test = Test(id=test_id, name=test_name, conducted_on=conducted_on, questions=res, durations=duration,\
-        grade=data['grade'], ends_on=ends_after)
-=======
     new_test = Test(id=test_id, name=test_name, conducted_on=conducted_on, questions=res, durations=duration, ends_on=ends_after,grade = grades)
->>>>>>> 689afb58d083015836765e4384fcc93615d545c1
     db.session.add(new_test)
     db.session.flush()
     db.session.commit()
