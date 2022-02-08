@@ -12,7 +12,7 @@ scheduler = BackgroundScheduler(daemon=True)
 
 def activate_test():
     with app().app_context():
-        tests = model.Test.query.filter(func.DATE(model.Test.conducted_on) == date.today()).all()
+        tests = model.Test.query.filter(func.DATE(model.Test.conducted_on) == func.DATE(date.today())).all()
         for i in tests:
             if i.conducted_on <= datetime.now() and not i.is_active:
                 i.is_active = True

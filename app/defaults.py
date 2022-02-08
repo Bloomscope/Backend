@@ -2,15 +2,12 @@ from .model import Parameters, UsersType, db
 
 
 PARAMETERS = [
-    (1, "Cognitive Skills"),
-    (2, "Remembering"),
-    (3, "Testing"),
-    (4, "Coding"),
-    (5, "Solving"),
-    (6, "Seeing"),
-    (7, "Nothing"),
-    (8, "Breathing"),
-    (9, "Swimming"),
+    (1, "Remember"),
+    (2, "Understand"),
+    (3, "Apply"),
+    (4, "Analyze"),
+    (5, "Evaluate"),
+    (6, "Create"),
 ]
 
 USER_TYPES = [
