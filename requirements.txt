@@ -32,6 +32,7 @@ MarkupSafe==2.0.1
 passlib==1.7.4
 pendulum==2.1.2
 prompt-toolkit==3.0.24
+psycopg2==2.9.3
 py-buzz==1.0.3
 pycparser==2.21
 PyJWT==2.3.0
